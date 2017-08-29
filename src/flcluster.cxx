@@ -57,6 +57,7 @@ static const char *copyright[] = {
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Menu_Item.H>
 #include <FL/Fl_File_Icon.H>
+#include <FL/Fl_Tooltip.H>
 
 #include "flcluster.h"
 #include "dx_dialog.h"
@@ -162,22 +163,6 @@ void make_pixmap(Pixmap *xpm, const char **data)
 /** ********************************************************
  *
  ***********************************************************/
-int default_handler(int event)
-{
-	if (event != FL_SHORTCUT)
-		return 0;
-
-	else if (Fl::event_ctrl())  {
-		Fl_Widget* w = Fl::focus();
-		return w->handle(FL_KEYBOARD);
-	}
-
-	return 0;
-}
-
-/** ********************************************************
- *
- ***********************************************************/
 void checkdirectories(void)
 {
 
@@ -193,15 +178,18 @@ void checkdirectories(void)
 		if (HOME_DIR.empty()) {
 			fl_filename_expand(dirbuf, sizeof(dirbuf) -1, "$USERPROFILE/");
 			HOME_DIR = dirbuf;
+			HOME_DIR.append("flcluster.files/");
 		}
 #else
 		if (HOME_DIR.empty()) {
 			fl_filename_expand(dirbuf, sizeof(dirbuf) -1, "$HOME/");
 			HOME_DIR = dirbuf;
+			HOME_DIR.append(".flcluster/");
 		}
 #endif
 	}
-	HOME_DIR.append("flcluster.files/");
+	if ((HOME_DIR[HOME_DIR.length()-1] != '/') ||
+		(HOME_DIR[HOME_DIR.length()-1] != '/')) HOME_DIR += '/';
 
 	DIRS FLCLUSTER_dirs[] = {
 		{ HOME_DIR, 0, 0 },
@@ -316,7 +304,7 @@ int main(int argc, char *argv[])
 	}
 
 	Fl::lock();
-	Fl::scheme("gtk+");
+//	Fl::scheme("gtk+");
 
 	checkdirectories();
 
@@ -326,13 +314,10 @@ int main(int argc, char *argv[])
 	debug_file.append("debug_log.txt");
 	debug::start(debug_file.c_str());
 
-	LOG_INFO("flcluster home directory: %s", HOME_DIR.c_str());
+	LOG_INFO("flcluster debug");
 
 	main_window = dxc_window();
-	main_window->resize( progStatus.mainX, progStatus.mainY, main_window->w(), main_window->h());
 	main_window->callback(exit_main);
-
-	Fl::add_handler(default_handler);
 
 	Fl_File_Icon::load_system_icons();
 	FSEL::create();
@@ -351,15 +336,17 @@ int main(int argc, char *argv[])
 	main_window->show(argc, argv);
 #endif
 
-	if (string(main_window->label()) == "") {
-		string main_label = PACKAGE_NAME;
-		main_label.append(": ").append(PACKAGE_VERSION);
-		main_window->label(main_label.c_str());
-	}
+	string main_label = PACKAGE_NAME;
+	main_label.append(": ").append(PACKAGE_VERSION);
+	main_window->label(main_label.c_str());
+
+	main_window->resize( progStatus.mainX, progStatus.mainY, progStatus.mainW, progStatus.mainH);
 
 	open_fldigi_xmlrpc();
 
 	DXcluster_init();
+
+	Fl_Tooltip::enable(progStatus.tooltips);
 
 	return Fl::run();
 }

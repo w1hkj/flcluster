@@ -33,6 +33,8 @@ using namespace std;
 struct status {
 	int		mainX;
 	int		mainY;
+	int		mainW;
+	int		mainH;
 
 	std::string myCall;
 	std::string myName;
@@ -69,6 +71,8 @@ struct status {
 	std::string dxcm_text_7;
 	std::string dxcm_text_8;
 
+	int keepalive;
+
 	int DX_Color_R;
 	int DX_Color_G;
 	int DX_Color_B;
@@ -76,17 +80,13 @@ struct status {
 	Fl_Color DXC_even_color;
 	Fl_Color DXC_odd_color;
 	Fl_Color DXC_textcolor;
-
-	std::string DXC_textname;
 	Fl_Font  DXC_textfont;
-	int DXC_textsize;
+	int      DXC_textsize;
 
 	Fl_Color  DXfontcolor;
 	Fl_Color  DXalt_color;
-
-	std::string  DXfontname;
-	Fl_Font DXfontnbr;
-	int DXfontsize;
+	Fl_Font   DXfontnbr;
+	int       DXfontsize;
 
 	Fl_Color  TabsColor;
 
@@ -105,6 +105,8 @@ struct status {
 	bool connect_to_flrig;
 	std::string flrig_address;
 	std::string flrig_port;
+
+	bool tooltips;
 
 	bool changed;
 	void saveLastState();

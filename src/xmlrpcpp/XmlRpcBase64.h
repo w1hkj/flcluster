@@ -18,6 +18,7 @@
 #if !defined(__BASE64_H_INCLUDED__)
 #define __BASE64_H_INCLUDED__ 1
 
+#include <iostream> // for _IOS_XXXX flags
 #include <iterator>
 
 static
@@ -168,7 +169,6 @@ public:
 		{
 			_3to4.zero();
 
-			// берём по 3 символа
 			_3to4.set_0(*_First);
 			_First++;
 
@@ -201,7 +201,7 @@ public:
 			*_To = _Tr::to_char_type(_xmlrpc_base64Chars[_3to4.b64_2()]); ++_To;
 			*_To = _Tr::to_char_type(_xmlrpc_base64Chars[_3to4.b64_3()]); ++_To;
 
-			if(line_octets == 17) // xmlrpc_base64 позволяет длину строки не более 72 символов
+			if(line_octets == 17) // xmlrpc_base64
 			{
 				//_To = _Endl(_To);
         *_To = '\n'; ++_To;

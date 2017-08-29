@@ -907,25 +907,21 @@ int Socket::connect(void)
 
 	int res = ::connect(sockfd, ainfo->ai_addr, ainfo->ai_addrlen);
 
+// errno might be changed by system calls within the debug:: methods
+// save the ::connect errno state
+	int erc = errno;
+	LOG_INFO("%d : %s", erc, strerror(erc));
+
 	if (res == -1) {
-		if (errno == 0 || errno == EISCONN) {
-			LOG_INFO("Connected to %s : %s", address.get_str(ainfo).c_str(),
-				strerror(errno) );
+		if (erc == 0 || erc == EISCONN) {
 			connected_flag = true;
-			return errno;
+			return erc;
 		}
-		if (errno == EWOULDBLOCK || errno == EINPROGRESS || errno == EALREADY) { 
-			LOG_INFO("Connect attempt to %s : %d, %s", 
-				address.get_str(ainfo).c_str(),
-				errno, strerror(errno));
-			return errno;
+		if (erc == EWOULDBLOCK || erc == EINPROGRESS || erc == EALREADY) { 
+			return erc;
 		}
-		LOG_ERROR("Connect to %s failed: %d, %s", 
-			address.get_str(ainfo).c_str(),
-			errno, strerror(errno));
-		throw SocketException(errno, "connect");
+		throw SocketException(erc, "connect");
 	}
-	LOG_INFO(" Connected to %s", address.get_str(ainfo).c_str());
 	connected_flag = true;
 	return EISCONN;
 }

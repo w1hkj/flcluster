@@ -32,6 +32,30 @@ Function {cbDXC_FontBrowser(Fl_Widget*, void*)} {open private return_type void
 int size = font_browser->fontSize();
 Fl_Color color = font_browser->fontColor();
 
+progStatus.DXC_textcolor = color;
+progStatus.DXC_textfont = font;
+progStatus.DXC_textsize = size;
+
+DXC_display->textcolor(color);
+DXC_display->textfont(font);
+DXC_display->textsize(size);
+DXC_display->redraw();
+
+reports_header->redraw();
+
+brws_dx_cluster->redraw();
+      
+font_browser->hide();
+
+dxc_lines();} {}
+}
+
+Function {cbDX_FontBrowser(Fl_Widget*, void*)} {open private return_type void
+} {
+  code {Fl_Font font = font_browser->fontNumber();
+int size = font_browser->fontSize();
+Fl_Color color = font_browser->fontColor();
+
 progStatus.DXfontcolor = color;
 progStatus.DXfontnbr = font;
 progStatus.DXfontsize = size;
@@ -47,6 +71,8 @@ ed_telnet_cmds->setFontColor(color);
 ed_telnet_cmds->redraw();
 
 StreamText->textcolor(color);
+StreamText->textfont(font);
+StreamText->textsize(size);
 StreamText->redraw();
 
 brws_dxc_help->color(fl_rgb_color(
@@ -76,9 +102,11 @@ Function {dxc_window()} {open
   code {font_browser = new Font_Browser;} {}
   Fl_Window {} {
     label {DX Cluster Spotting} open
-    xywh {602 67 680 420} type Double resizable visible
+    xywh {668 48 680 420} type Double resizable
+    code0 {o->resizable(cluster_tabs);}
+    code1 {o->size_range(680,420,0,0);} visible
   } {
-    Fl_Menu_Bar {} {open
+    Fl_Menu_Bar {} {open selected
       xywh {0 0 680 22}
     } {
       Submenu mnuFile {
@@ -92,8 +120,9 @@ Function {dxc_window()} {open
         }
       }
     }
-    Fl_Group btn_select_host {open
+    Fl_Group btn_select_host {
       xywh {0 25 678 50} box ENGRAVED_BOX
+      code0 {o->resizable(inp_dxcc_host_url);}
     } {
       Fl_Input inp_dxcc_host_url {
         label {DX HOST hostname/IP}
@@ -162,13 +191,16 @@ progStatus.changed = true;}
     }
     Fl_Tabs cluster_tabs {open
       xywh {0 78 680 340} resizable
+      code0 {o->resizable(tabDXclusterReports);}
     } {
       Fl_Group tabDXclusterTelNetStream {
-        label {TelNet stream} open selected
-        xywh {0 100 680 314}
+        label {TelNet stream}
+        xywh {0 100 680 314} hide
+        code0 {o->resizable(gp_resize_telnet);}
       } {
-        Fl_Group {} {open
-          xywh {2 102 676 276} box ENGRAVED_FRAME
+        Fl_Group gp_resize_telnet {open
+          xywh {2 102 676 276} box ENGRAVED_FRAME resizable
+          code0 {o->resizable(brws_tcpip_stream);}
         } {
           Fl_Text_Editor brws_tcpip_stream {
             tooltip {Cluster server command strings} xywh {4 105 668 240} labelsize 13 textfont 13 resizable
@@ -224,26 +256,32 @@ progStatus.changed = true;}
             code0 {o->label(progStatus.dxcm_label_8.c_str());}
           }
         }
-        Fl_Input inp_dxcluster_cmd {
-          label {Cmd:}
-          callback {DXcluster_submit();}
-          tooltip {Command string} xywh {43 384 480 22} labelsize 13 when 8
-          class Fl_Input2
-        }
-        Fl_Button btn_cluster_spot {
-          label Spot
-          callback {send_DXcluster_spot();}
-          tooltip {Send SPOT string to server} xywh {527 384 70 22}
-        }
-        Fl_Button btn_cluster_submit {
-          label Submit
-          callback {DXcluster_submit();}
-          tooltip {Send command to server} xywh {602 384 70 22}
+        Fl_Group gp_spot_cmds {open
+          xywh {2 380 676 33}
+          code0 {o->resizable(inp_dxcluster_cmd);}
+        } {
+          Fl_Input inp_dxcluster_cmd {
+            label {Cmd:}
+            callback {DXcluster_submit();}
+            tooltip {Command string} xywh {40 386 480 22} labelsize 13 when 8
+            class Fl_Input2
+          }
+          Fl_Button btn_cluster_spot {
+            label Spot
+            callback {send_DXcluster_spot();}
+            tooltip {Send SPOT string to server} xywh {524 386 70 22}
+          }
+          Fl_Button btn_cluster_submit {
+            label Submit
+            callback {DXcluster_submit();}
+            tooltip {Send command to server} xywh {599 386 70 22}
+          }
         }
       }
       Fl_Group tabDXclusterReports {
-        label {DX Reports} open
+        label {DX Reports}
         xywh {0 100 680 314} hide
+        code0 {o->resizable(brws_dx_cluster);}
       } {
         Fl_Browser reports_header {
           xywh {3 104 671 20} color 52 when 2 textfont 4
@@ -255,7 +293,7 @@ progStatus.changed = true;}
         Fl_Button btn_dxc_cluster_clear {
           label Clear
           callback {brws_dx_cluster->clear();}
-          tooltip {Clear parsed data stream} xywh {294 386 72 22}
+          tooltip {Clear parsed data stream} xywh {294 390 72 22}
         }
         Fl_Check_Button brws_order {
           label {New entries in first line}
@@ -268,18 +306,26 @@ progStatus.changed=true;}
         Fl_Button btn_cluster_spot2 {
           label Spot
           callback {send_DXcluster_spot();}
-          tooltip {Send SPOT string to server} xywh {585 388 70 22}
+          tooltip {Send SPOT string to server} xywh {585 390 70 22}
+        }
+        Fl_Output txtTOD {
+          xywh {475 390 90 22}
+        }
+        Fl_Box box_keepalive {
+          xywh {450 392 18 18} box DIAMOND_DOWN_BOX
         }
       }
       Fl_Group tabDXclusterConfig {
-        label {Cluster Config} open
-        tooltip {Initialization strings for telnet cluster host} xywh {0 100 680 314} hide
+        label {Cluster Config} selected
+        tooltip {Initialization strings for telnet cluster host} xywh {0 100 680 314}
+        code0 {o->resizable(cc_resize_1);}
       } {
-        Fl_Group {} {open
+        Fl_Group cc_resize_1 {open
           xywh {0 102 676 130} resizable
         } {
           Fl_Group {} {open
-            xywh {1 102 348 124}
+            xywh {1 102 348 126}
+            code0 {o->resizable(brws_dxcluster_hosts);}
           } {
             Fl_Browser brws_dxcluster_hosts {
               label Hosts
@@ -289,49 +335,66 @@ progStatus.changed=true;}
               code2 {o->column_char(':');}
               code3 {dxcluster_hosts_load();}
             }
-            Fl_Button btn_dxcluster_hosts_select {
-              label Select
-              callback dxcluster_hosts_select
-              tooltip {Select highlighted DX cluster host} xywh {288 121 54 22}
-            }
-            Fl_Button btn_dxcluster_hosts_add {
-              label Add
-              callback dxcluster_hosts_add
-              tooltip {Add current DX cluster host} xywh {288 147 54 22}
-            }
-            Fl_Button btn_dxcluster_hosts_delete {
-              label Delete
-              callback dxcluster_hosts_delete
-              tooltip {Delete highlighted DX cluster host} xywh {288 173 54 22}
-            }
-            Fl_Button btn_dxcluster_servers {
-              label Srvrs
-              callback dxcluster_servers
-              tooltip {Server List} xywh {288 199 54 22}
+            Fl_Group {} {open
+              xywh {285 118 60 108}
+              code0 {o->resizable(gp_resize_dummy1);}
+            } {
+              Fl_Button btn_dxcluster_hosts_select {
+                label Select
+                callback dxcluster_hosts_select
+                tooltip {Select highlighted DX cluster host} xywh {288 120 54 22}
+              }
+              Fl_Button btn_dxcluster_hosts_add {
+                label Add
+                callback dxcluster_hosts_add
+                tooltip {Add current DX cluster host} xywh {288 146 54 22}
+              }
+              Fl_Button btn_dxcluster_hosts_delete {
+                label Delete
+                callback dxcluster_hosts_delete
+                tooltip {Delete highlighted DX cluster host} xywh {288 172 54 22}
+              }
+              Fl_Button btn_dxcluster_servers {
+                label Srvrs
+                callback dxcluster_servers
+                tooltip {Server List} xywh {288 198 54 22}
+              }
+              Fl_Group gp_resize_dummy1 {open
+                xywh {288 222 54 4} resizable
+              } {}
             }
           }
           Fl_Group {} {open
-            xywh {350 102 325 107}
+            xywh {350 102 325 104}
+            code0 {o->resizable(ed_telnet_cmds);}
           } {
             Fl_Text_Editor ed_telnet_cmds {
               label {Cluster Server Setup Cmds}
               tooltip {Cluster server command strings} xywh {354 121 248 80} textfont 13 resizable
               class FTextEdit
             }
-            Fl_Button btn_dxcluster_hosts_load_setup {
-              label Load
-              callback dxcluster_hosts_load_setup
-              tooltip {Load Cluster Setup Commands} xywh {609 121 59 22}
-            }
-            Fl_Button btn_dxcluster_hosts_save_setup {
-              label Save
-              callback dxcluster_hosts_save_setup
-              tooltip {Save Cluster Setup Commands} xywh {609 150 59 22}
-            }
-            Fl_Button btn_dxcluster_hosts_send_setup {
-              label Send
-              callback dxcluster_hosts_send_setup
-              tooltip {Send Commands to Cluster Server} xywh {609 179 59 22}
+            Fl_Group {} {open
+              xywh {605 116 68 89}
+              code0 {o->resizable(gp_resize_dummy2);}
+            } {
+              Fl_Button btn_dxcluster_hosts_load_setup {
+                label Load
+                callback dxcluster_hosts_load_setup
+                tooltip {Load Cluster Setup Commands} xywh {610 121 59 22}
+              }
+              Fl_Button btn_dxcluster_hosts_save_setup {
+                label Save
+                callback dxcluster_hosts_save_setup
+                tooltip {Save Cluster Setup Commands} xywh {610 150 59 22}
+              }
+              Fl_Button btn_dxcluster_hosts_send_setup {
+                label Send
+                callback dxcluster_hosts_send_setup
+                tooltip {Send Commands to Cluster Server} xywh {610 179 59 22}
+              }
+              Fl_Group gp_resize_dummy2 {open
+                xywh {610 202 59 2} resizable
+              } {}
             }
           }
           Fl_Check_Button btn_spot_when_logged {
@@ -500,12 +563,13 @@ progStatus.changed=true;}
         }
       }
       Fl_Group tabIOconfig {
-        label {I/O config} open
+        label {I/O config}
         xywh {0 100 680 315} hide
+        code0 {o->resizable(gp_resize_io);}
       } {
         Fl_Group {} {
           label {Fldigi/Flrig Interface} open
-          xywh {10 110 660 300} box ENGRAVED_FRAME align 17
+          xywh {10 110 660 272} box ENGRAVED_FRAME align 17
         } {
           Fl_Check_Button btn_connect_to_fldigi {
             label {Connect to Fldigi}
@@ -622,10 +686,14 @@ if (progStatus.LSBCW) {
             tooltip {Connected State} xywh {185 140 20 20} box DIAMOND_DOWN_BOX color 55 align 8
           }
         }
+        Fl_Group gp_resize_io {open
+          xywh {10 388 660 15}
+        } {}
       }
       Fl_Group tabUserConfig {
         label {User Config} open
         xywh {0 100 680 314} hide
+        code0 {o->resizable(gp_resize_uc);}
       } {
         Fl_Input inp_myCall {
           label myCall
@@ -652,11 +720,11 @@ if (progStatus.LSBCW) {
           code0 {o->value(progStatus.myLocator.c_str());}
         }
         Fl_Group {} {open
-          xywh {54 258 587 137} box ENGRAVED_FRAME align 21
+          xywh {54 248 587 137} box ENGRAVED_FRAME align 21
         } {
           Fl_Output DXC_display {
             label {Report Browser}
-            xywh {73 283 184 25} align 5
+            xywh {73 273 184 25} align 5
             code0 {o->textfont(progStatus.DXC_textfont);o->textsize(progStatus.DXC_textsize);}
             code2 {o->value("DX de W1HKJ-1");}
             code3 {o->redraw();}
@@ -669,7 +737,7 @@ font_browser->fontColor(progStatus.DXC_textcolor);
 font_browser->fontFilter(Font_Browser::FIXED_WIDTH);
 font_browser->callback(cbDXC_FontBrowser);
 font_browser->show();}
-            xywh {262 283 86 25}
+            xywh {262 273 86 25}
             code0 {\#include "font_browser.h"}
           }
           Fl_Button btnDXCdefault_colors_font {
@@ -685,14 +753,14 @@ DXC_display->textcolor(progStatus.DXC_textcolor);
 DXC_display->textfont(progStatus.DXC_textfont);
 
 DXC_display->redraw();}
-            xywh {354 283 86 25}
+            xywh {354 273 86 25}
           }
           Fl_Button btn_DXC_even_lines {
             label {Even Lines}
             callback {progStatus.DXC_even_color = fl_show_colormap((Fl_Color)progStatus.DXC_even_color);
 o->color(progStatus.DXC_even_color);
 o->redraw();}
-            xywh {262 314 86 25} color 55
+            xywh {262 304 86 25} color 55
             code0 {o->color(progStatus.DXC_even_color);}
             code1 {\#include <FL/fl_show_colormap.H>}
           }
@@ -701,12 +769,12 @@ o->redraw();}
             callback {progStatus.DXC_odd_color = fl_show_colormap((Fl_Color)progStatus.DXC_odd_color);
 o->color(progStatus.DXC_odd_color);
 o->redraw();}
-            xywh {354 314 86 25} color 246
+            xywh {354 304 86 25} color 246
             code0 {o->color(progStatus.DXC_odd_color);}
           }
           Fl_Input StreamText {
             label {Stream Text}
-            xywh {73 353 184 25} align 5
+            xywh {73 343 184 25} align 5
             code0 {o->value("DX de W1HKJ...");}
             code1 {o->color(fl_rgb_color(progStatus.DX_Color_R, progStatus.DX_Color_G, progStatus.DX_Color_B));}
             code2 {o->textfont(progStatus.DXfontnbr); o->textsize(progStatus.DXfontsize); o->textcolor(progStatus.DXfontcolor);}
@@ -750,7 +818,7 @@ ed_telnet_cmds->color(fl_rgb_color(r,g,b));
 ed_telnet_cmds->redraw();
 
 dxcluster_hosts_load();}
-            xywh {262 353 86 25}
+            xywh {262 343 86 25}
           }
           Fl_Button btnDXfont {
             label Font
@@ -758,9 +826,9 @@ dxcluster_hosts_load();}
     font_browser->fontSize(progStatus.DXfontsize);
     font_browser->fontColor(progStatus.DXfontcolor);
     font_browser->fontFilter(Font_Browser::FIXED_WIDTH);
-    font_browser->callback(cbDXC_FontBrowser);
+    font_browser->callback(cbDX_FontBrowser);
 font_browser->show();}
-            xywh {354 353 86 25}
+            xywh {354 343 86 25}
           }
           Fl_Button btnDXalt_color {
             label {Alt Color}
@@ -771,7 +839,7 @@ o->redraw_label();
 
 brws_tcpip_stream->setFontColor(progStatus.DXalt_color, FTextBase::XMIT);
 brws_tcpip_stream->redraw();}
-            tooltip {Color for outgoing telnet text} xywh {446 352 86 25}
+            tooltip {Color for outgoing telnet text} xywh {446 342 86 25}
             code0 {o->labelcolor(progStatus.DXalt_color);}
           }
           Fl_Button btnDXdefault_colors_font {
@@ -825,13 +893,57 @@ StreamText->redraw();
 dxcluster_hosts_load();
 
 font_browser->hide();}
-            xywh {540 352 86 25}
+            xywh {540 342 86 25}
+          }
+        }
+        Fl_Group gp_resize_uc {open
+          xywh {7 388 664 15}
+        } {}
+        Fl_Check_Button btn_tooltips {
+          label {Enable Tooltips}
+          callback {progStatus.tooltips=o->value();
+Fl_Tooltip::enable(progStatus.tooltips);}
+          xywh {487 123 78 15} down_box DOWN_BOX value 1
+          code0 {\#include <FL/Fl_Tooltip.H>}
+          code1 {o->value(progStatus.tooltips);}
+        }
+        Fl_Group {} {
+          label {Keepalive signal} open
+          xywh {275 120 170 115} box ENGRAVED_BOX align 17
+        } {
+          Fl_Round_Button btn_one_keepalive {
+            label {every minute}
+            callback {progStatus.keepalive = 1;
+o->value(1);
+btn_five_keepalive->value(0);
+btn_ten_keepalive->value(0);}
+            xywh {285 152 151 20} down_box ROUND_DOWN_BOX
+            code0 {o->value(progStatus.keepalive == 1);}
+          }
+          Fl_Round_Button btn_five_keepalive {
+            label {every 5 minutes}
+            callback {progStatus.keepalive = 5;
+o->value(1);
+btn_one_keepalive->value(0);
+btn_ten_keepalive->value(0);}
+            xywh {285 175 151 20} down_box ROUND_DOWN_BOX
+            code0 {o->value(progStatus.keepalive == 5);}
+          }
+          Fl_Round_Button btn_ten_keepalive {
+            label {every 10 minutes}
+            callback {progStatus.keepalive = 10;
+o->value(1);
+btn_one_keepalive->value(0);
+btn_five_keepalive->value(0);}
+            xywh {285 198 151 20} down_box ROUND_DOWN_BOX
+            code0 {o->value(progStatus.keepalive == 10);}
           }
         }
       }
       Fl_Group tabDXclusterHelp {
-        label {Cluster Help} open
+        label {Cluster Help}
         xywh {0 100 680 314} hide
+        code0 {o->resizable(brws_dxc_help);}
       } {
         Fl_Text_Editor brws_dxc_help {
           tooltip {Cluster server command strings} xywh {3 104 673 281} labelsize 13 textfont 13 resizable

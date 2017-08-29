@@ -24,6 +24,7 @@ extern Fl_Check_Button *btn_dxc_auto_connect;
 #include <FL/Fl_Tabs.H>
 extern Fl_Tabs *cluster_tabs;
 extern Fl_Group *tabDXclusterTelNetStream;
+extern Fl_Group *gp_resize_telnet;
 #include "FTextView.h"
 extern FTextView *brws_tcpip_stream;
 extern void dxc_click_m1(Fl_Button*, void*);
@@ -42,6 +43,7 @@ extern void dxc_click_m7(Fl_Button*, void*);
 extern Fl_Button *dxc_macro_7;
 extern void dxc_click_m8(Fl_Button*, void*);
 extern Fl_Button *dxc_macro_8;
+extern Fl_Group *gp_spot_cmds;
 extern Fl_Input2 *inp_dxcluster_cmd;
 extern Fl_Button *btn_cluster_spot;
 extern Fl_Button *btn_cluster_submit;
@@ -52,7 +54,11 @@ extern Fl_Browser *brws_dx_cluster;
 extern Fl_Button *btn_dxc_cluster_clear;
 extern Fl_Check_Button *brws_order;
 extern Fl_Button *btn_cluster_spot2;
+#include <FL/Fl_Output.H>
+extern Fl_Output *txtTOD;
+extern Fl_Box *box_keepalive;
 extern Fl_Group *tabDXclusterConfig;
+extern Fl_Group *cc_resize_1;
 extern Fl_Browser *brws_dxcluster_hosts;
 extern void dxcluster_hosts_select(Fl_Button*, void*);
 extern Fl_Button *btn_dxcluster_hosts_select;
@@ -62,6 +68,7 @@ extern void dxcluster_hosts_delete(Fl_Button*, void*);
 extern Fl_Button *btn_dxcluster_hosts_delete;
 extern void dxcluster_servers(Fl_Button*, void*);
 extern Fl_Button *btn_dxcluster_servers;
+extern Fl_Group *gp_resize_dummy1;
 extern FTextEdit *ed_telnet_cmds;
 extern void dxcluster_hosts_load_setup(Fl_Button*, void*);
 extern Fl_Button *btn_dxcluster_hosts_load_setup;
@@ -69,6 +76,7 @@ extern void dxcluster_hosts_save_setup(Fl_Button*, void*);
 extern Fl_Button *btn_dxcluster_hosts_save_setup;
 extern void dxcluster_hosts_send_setup(Fl_Button*, void*);
 extern Fl_Button *btn_dxcluster_hosts_send_setup;
+extern Fl_Group *gp_resize_dummy2;
 extern Fl_Check_Button *btn_spot_when_logged;
 extern Fl_Check_Button *btn_dxc_hertz;
 #include <FL/Fl_Input.H>
@@ -111,12 +119,12 @@ extern Fl_Check_Button *btn_cw_mode_is_CW;
 extern Fl_Check_Button *btn_rtty_is_mark;
 extern Fl_Counter *intRTTYsweetspot;
 extern Fl_Box *lbl_fldigi_connected;
+extern Fl_Group *gp_resize_io;
 extern Fl_Group *tabUserConfig;
 extern Fl_Input *inp_myCall;
 extern Fl_Input *inp_myName;
 extern Fl_Input *inp_myQth;
 extern Fl_Input *inp_myLocator;
-#include <FL/Fl_Output.H>
 extern Fl_Output *DXC_display;
 #include "font_browser.h"
 extern Fl_Button *btn_DXC_font;
@@ -129,6 +137,13 @@ extern Fl_Button *btnDXcolor;
 extern Fl_Button *btnDXfont;
 extern Fl_Button *btnDXalt_color;
 extern Fl_Button *btnDXdefault_colors_font;
+extern Fl_Group *gp_resize_uc;
+#include <FL/Fl_Tooltip.H>
+extern Fl_Check_Button *btn_tooltips;
+#include <FL/Fl_Round_Button.H>
+extern Fl_Round_Button *btn_one_keepalive;
+extern Fl_Round_Button *btn_five_keepalive;
+extern Fl_Round_Button *btn_ten_keepalive;
 extern Fl_Group *tabDXclusterHelp;
 extern FTextView *brws_dxc_help;
 extern Fl_Button *btn_dxc_help_query;

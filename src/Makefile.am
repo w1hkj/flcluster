@@ -32,27 +32,23 @@ XMLRPCPP_SRC = \
 	xmlrpcpp/XmlRpcValue.h
 
 # We distribute these but do not always compile them
-EXTRA_flcluster_SOURCES = $(FLRIG_WIN32_RES_SRC) $(MINGW32_SRC) $(XMLRPCPP_SRC)
+EXTRA_flcluster_SOURCES = $(FLCLUSTER_WIN32_RES_SRC) $(MINGW32_SRC) $(XMLRPCPP_SRC)
 
 flcluster_SOURCES =
 
 if !ENABLE_FLXMLRPC
-
-flcluster_SOURCES += $(XMLRPCPP_SRC)
-flcluster_CPPFLAGS = @FLCLUSTER_BUILD_CPPFLAGS@
-flcluster_CXXFLAGS = @FLCLUSTER_BUILD_CXXFLAGS@
-flcluster_CFLAGS = $(flcluster_CXXFLAGS)
-flcluster_LDFLAGS = @FLCLUSTER_BUILD_LDFLAGS@
-flcluster_LDADD = @FLCLUSTER_BUILD_LDADD@
-
+  flcluster_SOURCES += $(XMLRPCPP_SRC)
+  flcluster_CPPFLAGS = @FLCLUSTER_BUILD_CPPFLAGS@
+  flcluster_CXXFLAGS = @FLCLUSTER_BUILD_CXXFLAGS@
+  flcluster_CFLAGS = $(flcluster_CXXFLAGS)
+  flcluster_LDFLAGS = @FLCLUSTER_BUILD_LDFLAGS@
+  flcluster_LDADD = @FLCLUSTER_BUILD_LDADD@
 else
-
-flcluster_CPPFLAGS = @FLCLUSTER_BUILD_CPPFLAGS@ @FLXMLRPC_CFLAGS@
-flcluster_CXXFLAGS = @FLCLUSTER_BUILD_CXXFLAGS@ @FLXMLRPC_CFLAGS@
-flcluster_CFLAGS = $(flcluster_CXXFLAGS)
-flcluster_LDFLAGS = @FLCLUSTER_BUILD_LDFLAGS@ @FLXMLRPC_CFLAGS@
-flcluster_LDADD = @FLCLUSTER_BUILD_LDADD@
-
+  flcluster_CPPFLAGS = @FLCLUSTER_BUILD_CPPFLAGS@ @FLXMLRPC_CFLAGS@
+  flcluster_CXXFLAGS = @FLCLUSTER_BUILD_CXXFLAGS@ @FLXMLRPC_CFLAGS@
+  flcluster_CFLAGS = $(flcluster_CXXFLAGS)
+  flcluster_LDFLAGS = @FLCLUSTER_BUILD_LDFLAGS@ @FLXMLRPC_CFLAGS@
+  flcluster_LDADD = @FLCLUSTER_BUILD_LDADD@
 endif
 
 if MINGW32
@@ -208,7 +204,6 @@ EXTRA_DIST = \
 	widgets/Fl_Text_Buffer_mod.cxx \
 	widgets/Fl_Text_Display_mod.cxx \
 	widgets/Fl_Text_Editor_mod.cxx \
-	include/Fl_BlockMap.h \
 	include/Fl_Text_Buffer_mod.H \
 	include/Fl_Text_Display_mod.H \
 	include/Fl_Text_Editor_mod.H \

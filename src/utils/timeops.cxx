@@ -27,6 +27,8 @@
 #ifdef __MINGW32__
 #  include "compat.h"
 #  include "util.h"
+#else
+#  include "util.h"
 #endif
 
 #if !HAVE_CLOCK_GETTIME

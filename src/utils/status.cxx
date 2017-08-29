@@ -38,6 +38,8 @@
 status progStatus = {
 	50,				// int mainX;
 	50,				// int mainY;
+	640,			// int mainW;
+	420,			// int mainH;
 
 	"call sign",	// std::string myCall;
 	"name",			// std::string myName;
@@ -74,6 +76,8 @@ status progStatus = {
 	"",				// std::string dxcm_text_7;
 	"",				// std::string dxcm_text_8;
 
+	5,				// bool keepalive;
+
 	0,				// DX_Color_R;
 	0,				// DX_Color_G;
 	130,			// DX_Color_B;
@@ -82,14 +86,12 @@ status progStatus = {
 	246,			// Fl_Color DXC_odd_color
 	FL_YELLOW,		// Fl_Color DXC_textcolor
 
-	"",				// std::string DXC_textname
 	FL_COURIER,		// Fl_Font  DXC_textfont
 	14,				// int DXC_textsize
 
 	FL_YELLOW,		// Fl_Color  DXfontcolor
 	FL_DARK_RED,	// Fl_Color, DXalt_color
 
-	"",				// std::string  DXfontname
 	FL_COURIER,		// Fl_Font DXfontnbr
 	14,				// int DXfontsize
 
@@ -111,7 +113,8 @@ status progStatus = {
 	"127.0.0.1",	// std::string flrig_address;
 	"12345",		// std::string flrig_port;
 
-	false,			//bool changed;
+	true,			// bool tooltips
+	false,			// bool changed;
 
 };
 
@@ -124,14 +127,18 @@ void status::saveLastState()
 
 	int mX = main_window->x();
 	int mY = main_window->y();
+	mainW = main_window->w();
+	mainH = main_window->h();
 	if (mX >= 0 && mX >= 0) {
 		mainX = mX;
 		mainY = mY;
 	}
 
 	FLCLUSTERpref.set("version", PACKAGE_VERSION);
-	FLCLUSTERpref.set("mainx", mX);
-	FLCLUSTERpref.set("mainy", mY);
+	FLCLUSTERpref.set("mainx", mainX);
+	FLCLUSTERpref.set("mainy", mainY);
+	FLCLUSTERpref.set("mainw", mainW);
+	FLCLUSTERpref.set("mainh", mainH);
 
 	FLCLUSTERpref.set("dxcc_host_url", dxcc_host_url.c_str());
 	FLCLUSTERpref.set("dxcc_host_port", dxcc_host_port.c_str());
@@ -162,6 +169,8 @@ void status::saveLastState()
 	FLCLUSTERpref.set("dxcm_text_7", dxcm_text_7.c_str());
 	FLCLUSTERpref.set("dxcm_text_8", dxcm_text_8.c_str());
 
+	FLCLUSTERpref.set("keepalive", keepalive);
+
 	FLCLUSTERpref.set("cluster_connected", cluster_connected);
 	FLCLUSTERpref.set("dxc_auto_connect", dxc_auto_connect);
 	FLCLUSTERpref.set("dxc_topline", dxc_topline);
@@ -176,14 +185,12 @@ void status::saveLastState()
 	FLCLUSTERpref.set("DXC_odd_color", (int)DXC_odd_color);
 	FLCLUSTERpref.set("DXC_textcolor", (int)DXC_textcolor);
 
-	FLCLUSTERpref.set("DXC_textname", DXC_textname.c_str());
 	FLCLUSTERpref.set("DXC_textfont", DXC_textfont);
 	FLCLUSTERpref.set("DXC_textsize", DXC_textsize);
 
 	FLCLUSTERpref.set("DXfontcolor", (int)DXfontcolor);
 	FLCLUSTERpref.set("DXalt_color", (int)DXalt_color);
 
-	FLCLUSTERpref.set("DXfontname", DXfontname.c_str());
 	FLCLUSTERpref.set("DXfontnbr", DXfontnbr);
 	FLCLUSTERpref.set("DXfontsize", DXfontsize);
 
@@ -204,6 +211,8 @@ void status::saveLastState()
 	FLCLUSTERpref.set("connect_to_flrig", connect_to_flrig);
 	FLCLUSTERpref.set("flrig_address", flrig_address.c_str());
 	FLCLUSTERpref.set("flrig_port", flrig_port.c_str());
+
+	FLCLUSTERpref.set("tooltips", tooltips);
 }
 
 /** ********************************************************
@@ -218,6 +227,8 @@ void status::loadLastState()
 
 		FLCLUSTERpref.get("mainx", mainX, mainX);
 		FLCLUSTERpref.get("mainy", mainY, mainY);
+		FLCLUSTERpref.get("mainw", mainW, mainW);
+		FLCLUSTERpref.get("mainh", mainH, mainH);
 
 		FLCLUSTERpref.get("dxcc_host_url", defbuffer, "");
 		dxcc_host_url = defbuffer; free(defbuffer);
@@ -296,6 +307,8 @@ void status::loadLastState()
 
 		int i = 0;
 
+		FLCLUSTERpref.get("keepalive", keepalive, keepalive);
+
 		FLCLUSTERpref.get("cluster_connected", i, cluster_connected);
 		cluster_connected = i;
 
@@ -325,8 +338,6 @@ void status::loadLastState()
 		FLCLUSTERpref.get("DXC_textcolor", i, (int)DXC_textcolor);
 		DXC_textcolor = i;
 
-		FLCLUSTERpref.get("DXC_textname",  defbuffer, "");
-		DXC_textname = defbuffer; free(defbuffer);
 		FLCLUSTERpref.get("DXC_textfont", i, DXC_textfont);
 		DXC_textfont = i;
 		FLCLUSTERpref.get("DXC_textsize", i, DXC_textsize);
@@ -337,8 +348,6 @@ void status::loadLastState()
 		FLCLUSTERpref.get("DXalt_color", i, (int)DXalt_color);
 		DXalt_color = i;
 
-		FLCLUSTERpref.get("DXfontname",  defbuffer, "");
-		DXfontname = defbuffer; free(defbuffer);
 		FLCLUSTERpref.get("DXfontnbr", i, DXfontnbr);
 		DXfontnbr = i;
 		FLCLUSTERpref.get("DXfontsize", i, DXfontsize);
@@ -375,6 +384,9 @@ void status::loadLastState()
 		flrig_address = defbuffer; free(defbuffer);
 		FLCLUSTERpref.get("flrig_port",  defbuffer, "");
 		flrig_port = defbuffer; free(defbuffer);
+
+		FLCLUSTERpref.get("tooltips", i, tooltips);
+		tooltips = i;
 
 	}
 }

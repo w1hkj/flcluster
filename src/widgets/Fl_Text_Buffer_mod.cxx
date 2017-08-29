@@ -38,7 +38,7 @@
 
 #include <config.h>
 
-#if FLAMP_FLTK_API_MAJOR == 1 && FLAMP_FLTK_API_MINOR < 3
+#if FLCLUSTER_FLTK_API_MAJOR == 1 && FLCLUSTER_FLTK_API_MINOR < 3
 #	error "FLTK versions less then 1.3 are no longer supported"
 #endif
 

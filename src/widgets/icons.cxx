@@ -4,7 +4,7 @@
 // Copyright (C) 2008
 //              Stelios Bounanos, M0GLD
 //
-// This file is part of FLAMP.
+// This file is part of FLCLUSTER.
 //
 // This is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by

@@ -2,6 +2,7 @@
 
 ### Script to create the .app structure for osx
 ### 20090730  Stelios Bounanos M0GLD
+### 20170826  David Freese W1HKJ
 
 if [ $# -ne 2 ]; then
     echo "Syntax: $0 data-dir build-dir" >&2
@@ -107,8 +108,8 @@ name=$(echo "$PACKAGE_TARNAME" | upcase1)
 signature="$(echo $PACKAGE_TARNAME | sed 's/[aeiouAEIOU]//g; s/\(^....\).*/\1/')"
 binary="$PACKAGE_TARNAME"
 icon="$flcluster_icon"
-version="${FLAMP_VERSION_MAJOR}.${FLAMP_VERSION_MINOR}"
-appversion="$FLAMP_VERSION"
+version="${FLCLUSTER_VERSION_MAJOR}.${FLCLUSTER_VERSION_MINOR}"
+appversion="$FLCLUSTER_VERSION"
 
 bundle
 

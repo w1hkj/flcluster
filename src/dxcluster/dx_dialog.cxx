@@ -15,6 +15,29 @@ static void cbDXC_FontBrowser(Fl_Widget*, void*) {
   int size = font_browser->fontSize();
   Fl_Color color = font_browser->fontColor();
   
+  progStatus.DXC_textcolor = color;
+  progStatus.DXC_textfont = font;
+  progStatus.DXC_textsize = size;
+  
+  DXC_display->textcolor(color);
+  DXC_display->textfont(font);
+  DXC_display->textsize(size);
+  DXC_display->redraw();
+  
+  reports_header->redraw();
+  
+  brws_dx_cluster->redraw();
+        
+  font_browser->hide();
+  
+  dxc_lines();
+}
+
+static void cbDX_FontBrowser(Fl_Widget*, void*) {
+  Fl_Font font = font_browser->fontNumber();
+  int size = font_browser->fontSize();
+  Fl_Color color = font_browser->fontColor();
+  
   progStatus.DXfontcolor = color;
   progStatus.DXfontnbr = font;
   progStatus.DXfontsize = size;
@@ -30,6 +53,8 @@ static void cbDXC_FontBrowser(Fl_Widget*, void*) {
   ed_telnet_cmds->redraw();
   
   StreamText->textcolor(color);
+  StreamText->textfont(font);
+  StreamText->textsize(size);
   StreamText->redraw();
   
   brws_dxc_help->color(fl_rgb_color(
@@ -128,6 +153,8 @@ Fl_Tabs *cluster_tabs=(Fl_Tabs *)0;
 
 Fl_Group *tabDXclusterTelNetStream=(Fl_Group *)0;
 
+Fl_Group *gp_resize_telnet=(Fl_Group *)0;
+
 FTextView *brws_tcpip_stream=(FTextView *)0;
 
 Fl_Button *dxc_macro_1=(Fl_Button *)0;
@@ -145,6 +172,8 @@ Fl_Button *dxc_macro_6=(Fl_Button *)0;
 Fl_Button *dxc_macro_7=(Fl_Button *)0;
 
 Fl_Button *dxc_macro_8=(Fl_Button *)0;
+
+Fl_Group *gp_spot_cmds=(Fl_Group *)0;
 
 Fl_Input2 *inp_dxcluster_cmd=(Fl_Input2 *)0;
 
@@ -194,7 +223,13 @@ static void cb_btn_cluster_spot2(Fl_Button*, void*) {
   send_DXcluster_spot();
 }
 
+Fl_Output *txtTOD=(Fl_Output *)0;
+
+Fl_Box *box_keepalive=(Fl_Box *)0;
+
 Fl_Group *tabDXclusterConfig=(Fl_Group *)0;
+
+Fl_Group *cc_resize_1=(Fl_Group *)0;
 
 Fl_Browser *brws_dxcluster_hosts=(Fl_Browser *)0;
 
@@ -206,6 +241,8 @@ Fl_Button *btn_dxcluster_hosts_delete=(Fl_Button *)0;
 
 Fl_Button *btn_dxcluster_servers=(Fl_Button *)0;
 
+Fl_Group *gp_resize_dummy1=(Fl_Group *)0;
+
 FTextEdit *ed_telnet_cmds=(FTextEdit *)0;
 
 Fl_Button *btn_dxcluster_hosts_load_setup=(Fl_Button *)0;
@@ -213,6 +250,8 @@ Fl_Button *btn_dxcluster_hosts_load_setup=(Fl_Button *)0;
 Fl_Button *btn_dxcluster_hosts_save_setup=(Fl_Button *)0;
 
 Fl_Button *btn_dxcluster_hosts_send_setup=(Fl_Button *)0;
+
+Fl_Group *gp_resize_dummy2=(Fl_Group *)0;
 
 Fl_Check_Button *btn_spot_when_logged=(Fl_Check_Button *)0;
 
@@ -465,6 +504,8 @@ static void cb_intRTTYsweetspot(Fl_Counter* o, void*) {
 
 Fl_Box *lbl_fldigi_connected=(Fl_Box *)0;
 
+Fl_Group *gp_resize_io=(Fl_Group *)0;
+
 Fl_Group *tabUserConfig=(Fl_Group *)0;
 
 Fl_Input *inp_myCall=(Fl_Input *)0;
@@ -587,7 +628,7 @@ static void cb_btnDXfont(Fl_Button*, void*) {
     font_browser->fontSize(progStatus.DXfontsize);
     font_browser->fontColor(progStatus.DXfontcolor);
     font_browser->fontFilter(Font_Browser::FIXED_WIDTH);
-    font_browser->callback(cbDXC_FontBrowser);
+    font_browser->callback(cbDX_FontBrowser);
 font_browser->show();
 }
 
@@ -657,6 +698,42 @@ dxcluster_hosts_load();
 font_browser->hide();
 }
 
+Fl_Group *gp_resize_uc=(Fl_Group *)0;
+
+Fl_Check_Button *btn_tooltips=(Fl_Check_Button *)0;
+
+static void cb_btn_tooltips(Fl_Check_Button* o, void*) {
+  progStatus.tooltips=o->value();
+Fl_Tooltip::enable(progStatus.tooltips);
+}
+
+Fl_Round_Button *btn_one_keepalive=(Fl_Round_Button *)0;
+
+static void cb_btn_one_keepalive(Fl_Round_Button* o, void*) {
+  progStatus.keepalive = 1;
+o->value(1);
+btn_five_keepalive->value(0);
+btn_ten_keepalive->value(0);
+}
+
+Fl_Round_Button *btn_five_keepalive=(Fl_Round_Button *)0;
+
+static void cb_btn_five_keepalive(Fl_Round_Button* o, void*) {
+  progStatus.keepalive = 5;
+o->value(1);
+btn_one_keepalive->value(0);
+btn_ten_keepalive->value(0);
+}
+
+Fl_Round_Button *btn_ten_keepalive=(Fl_Round_Button *)0;
+
+static void cb_btn_ten_keepalive(Fl_Round_Button* o, void*) {
+  progStatus.keepalive = 10;
+o->value(1);
+btn_one_keepalive->value(0);
+btn_five_keepalive->value(0);
+}
+
 Fl_Group *tabDXclusterHelp=(Fl_Group *)0;
 
 FTextView *brws_dxc_help=(FTextView *)0;
@@ -694,7 +771,7 @@ Fl_Double_Window* dxc_window() {
       }
       o->menu(menu_);
     } // Fl_Menu_Bar* o
-    { btn_select_host = new Fl_Group(0, 25, 678, 50);
+    { Fl_Group* o = btn_select_host = new Fl_Group(0, 25, 678, 50);
       btn_select_host->box(FL_ENGRAVED_BOX);
       { Fl_Input2* o = inp_dxcc_host_url = new Fl_Input2(5, 48, 256, 22, _("DX HOST hostname/IP"));
         inp_dxcc_host_url->tooltip(_("telnet server URL"));
@@ -779,12 +856,14 @@ Fl_Double_Window* dxc_window() {
         btn_dxc_auto_connect->callback((Fl_Callback*)cb_btn_dxc_auto_connect);
         o->value(progStatus.dxc_auto_connect);
       } // Fl_Check_Button* btn_dxc_auto_connect
+      o->resizable(inp_dxcc_host_url);
       btn_select_host->end();
     } // Fl_Group* btn_select_host
-    { cluster_tabs = new Fl_Tabs(0, 78, 680, 340);
-      { tabDXclusterTelNetStream = new Fl_Group(0, 100, 680, 314, _("TelNet stream"));
-        { Fl_Group* o = new Fl_Group(2, 102, 676, 276);
-          o->box(FL_ENGRAVED_FRAME);
+    { Fl_Tabs* o = cluster_tabs = new Fl_Tabs(0, 78, 680, 340);
+      { Fl_Group* o = tabDXclusterTelNetStream = new Fl_Group(0, 100, 680, 314, _("TelNet stream"));
+        tabDXclusterTelNetStream->hide();
+        { Fl_Group* o = gp_resize_telnet = new Fl_Group(2, 102, 676, 276);
+          gp_resize_telnet->box(FL_ENGRAVED_FRAME);
           { brws_tcpip_stream = new FTextView(4, 105, 668, 240);
             brws_tcpip_stream->tooltip(_("Cluster server command strings"));
             brws_tcpip_stream->box(FL_DOWN_FRAME);
@@ -833,32 +912,39 @@ Fl_Double_Window* dxc_window() {
             dxc_macro_8->callback((Fl_Callback*)dxc_click_m8);
             o->label(progStatus.dxcm_label_8.c_str());
           } // Fl_Button* dxc_macro_8
-          o->end();
-        } // Fl_Group* o
-        { inp_dxcluster_cmd = new Fl_Input2(43, 384, 480, 22, _("Cmd:"));
-          inp_dxcluster_cmd->tooltip(_("Command string"));
-          inp_dxcluster_cmd->box(FL_DOWN_BOX);
-          inp_dxcluster_cmd->color(FL_BACKGROUND2_COLOR);
-          inp_dxcluster_cmd->selection_color(FL_SELECTION_COLOR);
-          inp_dxcluster_cmd->labeltype(FL_NORMAL_LABEL);
-          inp_dxcluster_cmd->labelfont(0);
-          inp_dxcluster_cmd->labelsize(13);
-          inp_dxcluster_cmd->labelcolor(FL_FOREGROUND_COLOR);
-          inp_dxcluster_cmd->callback((Fl_Callback*)cb_inp_dxcluster_cmd);
-          inp_dxcluster_cmd->align(Fl_Align(FL_ALIGN_LEFT));
-          inp_dxcluster_cmd->when(FL_WHEN_ENTER_KEY);
-        } // Fl_Input2* inp_dxcluster_cmd
-        { btn_cluster_spot = new Fl_Button(527, 384, 70, 22, _("Spot"));
-          btn_cluster_spot->tooltip(_("Send SPOT string to server"));
-          btn_cluster_spot->callback((Fl_Callback*)cb_btn_cluster_spot);
-        } // Fl_Button* btn_cluster_spot
-        { btn_cluster_submit = new Fl_Button(602, 384, 70, 22, _("Submit"));
-          btn_cluster_submit->tooltip(_("Send command to server"));
-          btn_cluster_submit->callback((Fl_Callback*)cb_btn_cluster_submit);
-        } // Fl_Button* btn_cluster_submit
+          o->resizable(brws_tcpip_stream);
+          gp_resize_telnet->end();
+          Fl_Group::current()->resizable(gp_resize_telnet);
+        } // Fl_Group* gp_resize_telnet
+        { Fl_Group* o = gp_spot_cmds = new Fl_Group(2, 380, 676, 33);
+          { inp_dxcluster_cmd = new Fl_Input2(40, 386, 480, 22, _("Cmd:"));
+            inp_dxcluster_cmd->tooltip(_("Command string"));
+            inp_dxcluster_cmd->box(FL_DOWN_BOX);
+            inp_dxcluster_cmd->color(FL_BACKGROUND2_COLOR);
+            inp_dxcluster_cmd->selection_color(FL_SELECTION_COLOR);
+            inp_dxcluster_cmd->labeltype(FL_NORMAL_LABEL);
+            inp_dxcluster_cmd->labelfont(0);
+            inp_dxcluster_cmd->labelsize(13);
+            inp_dxcluster_cmd->labelcolor(FL_FOREGROUND_COLOR);
+            inp_dxcluster_cmd->callback((Fl_Callback*)cb_inp_dxcluster_cmd);
+            inp_dxcluster_cmd->align(Fl_Align(FL_ALIGN_LEFT));
+            inp_dxcluster_cmd->when(FL_WHEN_ENTER_KEY);
+          } // Fl_Input2* inp_dxcluster_cmd
+          { btn_cluster_spot = new Fl_Button(524, 386, 70, 22, _("Spot"));
+            btn_cluster_spot->tooltip(_("Send SPOT string to server"));
+            btn_cluster_spot->callback((Fl_Callback*)cb_btn_cluster_spot);
+          } // Fl_Button* btn_cluster_spot
+          { btn_cluster_submit = new Fl_Button(599, 386, 70, 22, _("Submit"));
+            btn_cluster_submit->tooltip(_("Send command to server"));
+            btn_cluster_submit->callback((Fl_Callback*)cb_btn_cluster_submit);
+          } // Fl_Button* btn_cluster_submit
+          o->resizable(inp_dxcluster_cmd);
+          gp_spot_cmds->end();
+        } // Fl_Group* gp_spot_cmds
+        o->resizable(gp_resize_telnet);
         tabDXclusterTelNetStream->end();
       } // Fl_Group* tabDXclusterTelNetStream
-      { tabDXclusterReports = new Fl_Group(0, 100, 680, 314, _("DX Reports"));
+      { Fl_Group* o = tabDXclusterReports = new Fl_Group(0, 100, 680, 314, _("DX Reports"));
         tabDXclusterReports->hide();
         { reports_header = new Fl_Browser(3, 104, 671, 20);
           reports_header->color(FL_LIGHT2);
@@ -873,7 +959,7 @@ Fl_Double_Window* dxc_window() {
           brws_dx_cluster->align(Fl_Align(FL_ALIGN_BOTTOM|FL_ALIGN_INSIDE));
           Fl_Group::current()->resizable(brws_dx_cluster);
         } // Fl_Browser* brws_dx_cluster
-        { btn_dxc_cluster_clear = new Fl_Button(294, 386, 72, 22, _("Clear"));
+        { btn_dxc_cluster_clear = new Fl_Button(294, 390, 72, 22, _("Clear"));
           btn_dxc_cluster_clear->tooltip(_("Clear parsed data stream"));
           btn_dxc_cluster_clear->callback((Fl_Callback*)cb_btn_dxc_cluster_clear);
         } // Fl_Button* btn_dxc_cluster_clear
@@ -883,17 +969,22 @@ Fl_Double_Window* dxc_window() {
           brws_order->when(FL_WHEN_CHANGED);
           o->value(progStatus.dxc_topline);
         } // Fl_Check_Button* brws_order
-        { btn_cluster_spot2 = new Fl_Button(585, 388, 70, 22, _("Spot"));
+        { btn_cluster_spot2 = new Fl_Button(585, 390, 70, 22, _("Spot"));
           btn_cluster_spot2->tooltip(_("Send SPOT string to server"));
           btn_cluster_spot2->callback((Fl_Callback*)cb_btn_cluster_spot2);
         } // Fl_Button* btn_cluster_spot2
+        { txtTOD = new Fl_Output(475, 390, 90, 22);
+        } // Fl_Output* txtTOD
+        { box_keepalive = new Fl_Box(450, 392, 18, 18);
+          box_keepalive->box(FL_DIAMOND_DOWN_BOX);
+        } // Fl_Box* box_keepalive
+        o->resizable(brws_dx_cluster);
         tabDXclusterReports->end();
       } // Fl_Group* tabDXclusterReports
-      { tabDXclusterConfig = new Fl_Group(0, 100, 680, 314, _("Cluster Config"));
+      { Fl_Group* o = tabDXclusterConfig = new Fl_Group(0, 100, 680, 314, _("Cluster Config"));
         tabDXclusterConfig->tooltip(_("Initialization strings for telnet cluster host"));
-        tabDXclusterConfig->hide();
-        { Fl_Group* o = new Fl_Group(0, 102, 676, 130);
-          { Fl_Group* o = new Fl_Group(1, 102, 348, 124);
+        { cc_resize_1 = new Fl_Group(0, 102, 676, 130);
+          { Fl_Group* o = new Fl_Group(1, 102, 348, 126);
             { Fl_Browser* o = brws_dxcluster_hosts = new Fl_Browser(4, 121, 278, 100, _("Hosts"));
               brws_dxcluster_hosts->type(2);
               brws_dxcluster_hosts->textfont(4);
@@ -904,25 +995,34 @@ Fl_Double_Window* dxc_window() {
               o->column_char(':');
               dxcluster_hosts_load();
             } // Fl_Browser* brws_dxcluster_hosts
-            { btn_dxcluster_hosts_select = new Fl_Button(288, 121, 54, 22, _("Select"));
-              btn_dxcluster_hosts_select->tooltip(_("Select highlighted DX cluster host"));
-              btn_dxcluster_hosts_select->callback((Fl_Callback*)dxcluster_hosts_select);
-            } // Fl_Button* btn_dxcluster_hosts_select
-            { btn_dxcluster_hosts_add = new Fl_Button(288, 147, 54, 22, _("Add"));
-              btn_dxcluster_hosts_add->tooltip(_("Add current DX cluster host"));
-              btn_dxcluster_hosts_add->callback((Fl_Callback*)dxcluster_hosts_add);
-            } // Fl_Button* btn_dxcluster_hosts_add
-            { btn_dxcluster_hosts_delete = new Fl_Button(288, 173, 54, 22, _("Delete"));
-              btn_dxcluster_hosts_delete->tooltip(_("Delete highlighted DX cluster host"));
-              btn_dxcluster_hosts_delete->callback((Fl_Callback*)dxcluster_hosts_delete);
-            } // Fl_Button* btn_dxcluster_hosts_delete
-            { btn_dxcluster_servers = new Fl_Button(288, 199, 54, 22, _("Srvrs"));
-              btn_dxcluster_servers->tooltip(_("Server List"));
-              btn_dxcluster_servers->callback((Fl_Callback*)dxcluster_servers);
-            } // Fl_Button* btn_dxcluster_servers
+            { Fl_Group* o = new Fl_Group(285, 118, 60, 108);
+              { btn_dxcluster_hosts_select = new Fl_Button(288, 120, 54, 22, _("Select"));
+                btn_dxcluster_hosts_select->tooltip(_("Select highlighted DX cluster host"));
+                btn_dxcluster_hosts_select->callback((Fl_Callback*)dxcluster_hosts_select);
+              } // Fl_Button* btn_dxcluster_hosts_select
+              { btn_dxcluster_hosts_add = new Fl_Button(288, 146, 54, 22, _("Add"));
+                btn_dxcluster_hosts_add->tooltip(_("Add current DX cluster host"));
+                btn_dxcluster_hosts_add->callback((Fl_Callback*)dxcluster_hosts_add);
+              } // Fl_Button* btn_dxcluster_hosts_add
+              { btn_dxcluster_hosts_delete = new Fl_Button(288, 172, 54, 22, _("Delete"));
+                btn_dxcluster_hosts_delete->tooltip(_("Delete highlighted DX cluster host"));
+                btn_dxcluster_hosts_delete->callback((Fl_Callback*)dxcluster_hosts_delete);
+              } // Fl_Button* btn_dxcluster_hosts_delete
+              { btn_dxcluster_servers = new Fl_Button(288, 198, 54, 22, _("Srvrs"));
+                btn_dxcluster_servers->tooltip(_("Server List"));
+                btn_dxcluster_servers->callback((Fl_Callback*)dxcluster_servers);
+              } // Fl_Button* btn_dxcluster_servers
+              { gp_resize_dummy1 = new Fl_Group(288, 222, 54, 4);
+                gp_resize_dummy1->end();
+                Fl_Group::current()->resizable(gp_resize_dummy1);
+              } // Fl_Group* gp_resize_dummy1
+              o->resizable(gp_resize_dummy1);
+              o->end();
+            } // Fl_Group* o
+            o->resizable(brws_dxcluster_hosts);
             o->end();
           } // Fl_Group* o
-          { Fl_Group* o = new Fl_Group(350, 102, 325, 107);
+          { Fl_Group* o = new Fl_Group(350, 102, 325, 104);
             { ed_telnet_cmds = new FTextEdit(354, 121, 248, 80, _("Cluster Server Setup Cmds"));
               ed_telnet_cmds->tooltip(_("Cluster server command strings"));
               ed_telnet_cmds->box(FL_DOWN_FRAME);
@@ -937,18 +1037,27 @@ Fl_Double_Window* dxc_window() {
               ed_telnet_cmds->when(FL_WHEN_RELEASE);
               Fl_Group::current()->resizable(ed_telnet_cmds);
             } // FTextEdit* ed_telnet_cmds
-            { btn_dxcluster_hosts_load_setup = new Fl_Button(609, 121, 59, 22, _("Load"));
-              btn_dxcluster_hosts_load_setup->tooltip(_("Load Cluster Setup Commands"));
-              btn_dxcluster_hosts_load_setup->callback((Fl_Callback*)dxcluster_hosts_load_setup);
-            } // Fl_Button* btn_dxcluster_hosts_load_setup
-            { btn_dxcluster_hosts_save_setup = new Fl_Button(609, 150, 59, 22, _("Save"));
-              btn_dxcluster_hosts_save_setup->tooltip(_("Save Cluster Setup Commands"));
-              btn_dxcluster_hosts_save_setup->callback((Fl_Callback*)dxcluster_hosts_save_setup);
-            } // Fl_Button* btn_dxcluster_hosts_save_setup
-            { btn_dxcluster_hosts_send_setup = new Fl_Button(609, 179, 59, 22, _("Send"));
-              btn_dxcluster_hosts_send_setup->tooltip(_("Send Commands to Cluster Server"));
-              btn_dxcluster_hosts_send_setup->callback((Fl_Callback*)dxcluster_hosts_send_setup);
-            } // Fl_Button* btn_dxcluster_hosts_send_setup
+            { Fl_Group* o = new Fl_Group(605, 116, 68, 89);
+              { btn_dxcluster_hosts_load_setup = new Fl_Button(610, 121, 59, 22, _("Load"));
+                btn_dxcluster_hosts_load_setup->tooltip(_("Load Cluster Setup Commands"));
+                btn_dxcluster_hosts_load_setup->callback((Fl_Callback*)dxcluster_hosts_load_setup);
+              } // Fl_Button* btn_dxcluster_hosts_load_setup
+              { btn_dxcluster_hosts_save_setup = new Fl_Button(610, 150, 59, 22, _("Save"));
+                btn_dxcluster_hosts_save_setup->tooltip(_("Save Cluster Setup Commands"));
+                btn_dxcluster_hosts_save_setup->callback((Fl_Callback*)dxcluster_hosts_save_setup);
+              } // Fl_Button* btn_dxcluster_hosts_save_setup
+              { btn_dxcluster_hosts_send_setup = new Fl_Button(610, 179, 59, 22, _("Send"));
+                btn_dxcluster_hosts_send_setup->tooltip(_("Send Commands to Cluster Server"));
+                btn_dxcluster_hosts_send_setup->callback((Fl_Callback*)dxcluster_hosts_send_setup);
+              } // Fl_Button* btn_dxcluster_hosts_send_setup
+              { gp_resize_dummy2 = new Fl_Group(610, 202, 59, 2);
+                gp_resize_dummy2->end();
+                Fl_Group::current()->resizable(gp_resize_dummy2);
+              } // Fl_Group* gp_resize_dummy2
+              o->resizable(gp_resize_dummy2);
+              o->end();
+            } // Fl_Group* o
+            o->resizable(ed_telnet_cmds);
             o->end();
           } // Fl_Group* o
           { Fl_Check_Button* o = btn_spot_when_logged = new Fl_Check_Button(354, 208, 146, 15, _("Spot when logged"));
@@ -963,9 +1072,9 @@ Fl_Double_Window* dxc_window() {
             btn_dxc_hertz->callback((Fl_Callback*)cb_btn_dxc_hertz);
             o->value(progStatus.dxc_hertz);
           } // Fl_Check_Button* btn_dxc_hertz
-          o->end();
-          Fl_Group::current()->resizable(o);
-        } // Fl_Group* o
+          cc_resize_1->end();
+          Fl_Group::current()->resizable(cc_resize_1);
+        } // Fl_Group* cc_resize_1
         { Fl_Group* o = new Fl_Group(0, 238, 676, 174);
           o->align(Fl_Align(FL_ALIGN_TOP|FL_ALIGN_INSIDE));
           { Fl_Group* o = new Fl_Group(1, 238, 307, 170);
@@ -1132,11 +1241,12 @@ Fl_Double_Window* dxc_window() {
           } // Fl_Button* btn_dxcluster_dx_help
           o->end();
         } // Fl_Group* o
+        o->resizable(cc_resize_1);
         tabDXclusterConfig->end();
       } // Fl_Group* tabDXclusterConfig
-      { tabIOconfig = new Fl_Group(0, 100, 680, 315, _("I/O config"));
+      { Fl_Group* o = tabIOconfig = new Fl_Group(0, 100, 680, 315, _("I/O config"));
         tabIOconfig->hide();
-        { Fl_Group* o = new Fl_Group(10, 110, 660, 300, _("Fldigi/Flrig Interface"));
+        { Fl_Group* o = new Fl_Group(10, 110, 660, 272, _("Fldigi/Flrig Interface"));
           o->box(FL_ENGRAVED_FRAME);
           o->align(Fl_Align(FL_ALIGN_TOP|FL_ALIGN_INSIDE));
           { Fl_Check_Button* o = btn_connect_to_fldigi = new Fl_Check_Button(25, 143, 142, 15, _("Connect to Fldigi"));
@@ -1237,9 +1347,13 @@ Fl_Double_Window* dxc_window() {
           } // Fl_Box* lbl_fldigi_connected
           o->end();
         } // Fl_Group* o
+        { gp_resize_io = new Fl_Group(10, 388, 660, 15);
+          gp_resize_io->end();
+        } // Fl_Group* gp_resize_io
+        o->resizable(gp_resize_io);
         tabIOconfig->end();
       } // Fl_Group* tabIOconfig
-      { tabUserConfig = new Fl_Group(0, 100, 680, 314, _("User Config"));
+      { Fl_Group* o = tabUserConfig = new Fl_Group(0, 100, 680, 314, _("User Config"));
         tabUserConfig->hide();
         { Fl_Input* o = inp_myCall = new Fl_Input(34, 119, 90, 24, _("myCall"));
           inp_myCall->callback((Fl_Callback*)cb_inp_myCall);
@@ -1265,56 +1379,86 @@ Fl_Double_Window* dxc_window() {
           inp_myLocator->when(FL_WHEN_CHANGED);
           o->value(progStatus.myLocator.c_str());
         } // Fl_Input* inp_myLocator
-        { Fl_Group* o = new Fl_Group(54, 258, 587, 137);
+        { Fl_Group* o = new Fl_Group(54, 248, 587, 137);
           o->box(FL_ENGRAVED_FRAME);
           o->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
-          { Fl_Output* o = DXC_display = new Fl_Output(73, 283, 184, 25, _("Report Browser"));
+          { Fl_Output* o = DXC_display = new Fl_Output(73, 273, 184, 25, _("Report Browser"));
             DXC_display->align(Fl_Align(FL_ALIGN_TOP_LEFT));
             o->textfont(progStatus.DXC_textfont);o->textsize(progStatus.DXC_textsize);
             o->value("DX de W1HKJ-1");
             o->redraw();
           } // Fl_Output* DXC_display
-          { btn_DXC_font = new Fl_Button(262, 283, 86, 25, _("Font"));
+          { btn_DXC_font = new Fl_Button(262, 273, 86, 25, _("Font"));
             btn_DXC_font->callback((Fl_Callback*)cb_btn_DXC_font);
           } // Fl_Button* btn_DXC_font
-          { btnDXCdefault_colors_font = new Fl_Button(354, 283, 86, 25, _("Default"));
+          { btnDXCdefault_colors_font = new Fl_Button(354, 273, 86, 25, _("Default"));
             btnDXCdefault_colors_font->callback((Fl_Callback*)cb_btnDXCdefault_colors_font);
           } // Fl_Button* btnDXCdefault_colors_font
-          { Fl_Button* o = btn_DXC_even_lines = new Fl_Button(262, 314, 86, 25, _("Even Lines"));
+          { Fl_Button* o = btn_DXC_even_lines = new Fl_Button(262, 304, 86, 25, _("Even Lines"));
             btn_DXC_even_lines->color((Fl_Color)55);
             btn_DXC_even_lines->callback((Fl_Callback*)cb_btn_DXC_even_lines);
             o->color(progStatus.DXC_even_color);
           } // Fl_Button* btn_DXC_even_lines
-          { Fl_Button* o = btn_DXC_odd_lines = new Fl_Button(354, 314, 86, 25, _("Odd Lines"));
+          { Fl_Button* o = btn_DXC_odd_lines = new Fl_Button(354, 304, 86, 25, _("Odd Lines"));
             btn_DXC_odd_lines->color((Fl_Color)246);
             btn_DXC_odd_lines->callback((Fl_Callback*)cb_btn_DXC_odd_lines);
             o->color(progStatus.DXC_odd_color);
           } // Fl_Button* btn_DXC_odd_lines
-          { Fl_Input* o = StreamText = new Fl_Input(73, 353, 184, 25, _("Stream Text"));
+          { Fl_Input* o = StreamText = new Fl_Input(73, 343, 184, 25, _("Stream Text"));
             StreamText->align(Fl_Align(FL_ALIGN_TOP_LEFT));
             o->value("DX de W1HKJ...");
             o->color(fl_rgb_color(progStatus.DX_Color_R, progStatus.DX_Color_G, progStatus.DX_Color_B));
             o->textfont(progStatus.DXfontnbr); o->textsize(progStatus.DXfontsize); o->textcolor(progStatus.DXfontcolor);
           } // Fl_Input* StreamText
-          { btnDXcolor = new Fl_Button(262, 353, 86, 25, _("Bg color"));
+          { btnDXcolor = new Fl_Button(262, 343, 86, 25, _("Bg color"));
             btnDXcolor->callback((Fl_Callback*)cb_btnDXcolor);
           } // Fl_Button* btnDXcolor
-          { btnDXfont = new Fl_Button(354, 353, 86, 25, _("Font"));
+          { btnDXfont = new Fl_Button(354, 343, 86, 25, _("Font"));
             btnDXfont->callback((Fl_Callback*)cb_btnDXfont);
           } // Fl_Button* btnDXfont
-          { Fl_Button* o = btnDXalt_color = new Fl_Button(446, 352, 86, 25, _("Alt Color"));
+          { Fl_Button* o = btnDXalt_color = new Fl_Button(446, 342, 86, 25, _("Alt Color"));
             btnDXalt_color->tooltip(_("Color for outgoing telnet text"));
             btnDXalt_color->callback((Fl_Callback*)cb_btnDXalt_color);
             o->labelcolor(progStatus.DXalt_color);
           } // Fl_Button* btnDXalt_color
-          { btnDXdefault_colors_font = new Fl_Button(540, 352, 86, 25, _("Default"));
+          { btnDXdefault_colors_font = new Fl_Button(540, 342, 86, 25, _("Default"));
             btnDXdefault_colors_font->callback((Fl_Callback*)cb_btnDXdefault_colors_font);
           } // Fl_Button* btnDXdefault_colors_font
           o->end();
         } // Fl_Group* o
+        { gp_resize_uc = new Fl_Group(7, 388, 664, 15);
+          gp_resize_uc->end();
+        } // Fl_Group* gp_resize_uc
+        { Fl_Check_Button* o = btn_tooltips = new Fl_Check_Button(487, 123, 78, 15, _("Enable Tooltips"));
+          btn_tooltips->down_box(FL_DOWN_BOX);
+          btn_tooltips->value(1);
+          btn_tooltips->callback((Fl_Callback*)cb_btn_tooltips);
+          o->value(progStatus.tooltips);
+        } // Fl_Check_Button* btn_tooltips
+        { Fl_Group* o = new Fl_Group(275, 120, 170, 115, _("Keepalive signal"));
+          o->box(FL_ENGRAVED_BOX);
+          o->align(Fl_Align(FL_ALIGN_TOP|FL_ALIGN_INSIDE));
+          { Fl_Round_Button* o = btn_one_keepalive = new Fl_Round_Button(285, 152, 151, 20, _("every minute"));
+            btn_one_keepalive->down_box(FL_ROUND_DOWN_BOX);
+            btn_one_keepalive->callback((Fl_Callback*)cb_btn_one_keepalive);
+            o->value(progStatus.keepalive == 1);
+          } // Fl_Round_Button* btn_one_keepalive
+          { Fl_Round_Button* o = btn_five_keepalive = new Fl_Round_Button(285, 175, 151, 20, _("every 5 minutes"));
+            btn_five_keepalive->down_box(FL_ROUND_DOWN_BOX);
+            btn_five_keepalive->callback((Fl_Callback*)cb_btn_five_keepalive);
+            o->value(progStatus.keepalive == 5);
+          } // Fl_Round_Button* btn_five_keepalive
+          { Fl_Round_Button* o = btn_ten_keepalive = new Fl_Round_Button(285, 198, 151, 20, _("every 10 minutes"));
+            btn_ten_keepalive->down_box(FL_ROUND_DOWN_BOX);
+            btn_ten_keepalive->callback((Fl_Callback*)cb_btn_ten_keepalive);
+            o->value(progStatus.keepalive == 10);
+          } // Fl_Round_Button* btn_ten_keepalive
+          o->end();
+        } // Fl_Group* o
+        o->resizable(gp_resize_uc);
         tabUserConfig->end();
       } // Fl_Group* tabUserConfig
-      { tabDXclusterHelp = new Fl_Group(0, 100, 680, 314, _("Cluster Help"));
+      { Fl_Group* o = tabDXclusterHelp = new Fl_Group(0, 100, 680, 314, _("Cluster Help"));
         tabDXclusterHelp->hide();
         { brws_dxc_help = new FTextView(3, 104, 673, 281);
           brws_dxc_help->tooltip(_("Cluster server command strings"));
@@ -1351,11 +1495,15 @@ Fl_Double_Window* dxc_window() {
           btn_dxc_help_clear->tooltip(_("Clear help panel"));
           btn_dxc_help_clear->callback((Fl_Callback*)cb_btn_dxc_help_clear);
         } // Fl_Button* btn_dxc_help_clear
+        o->resizable(brws_dxc_help);
         tabDXclusterHelp->end();
       } // Fl_Group* tabDXclusterHelp
+      o->resizable(tabDXclusterReports);
       cluster_tabs->end();
       Fl_Group::current()->resizable(cluster_tabs);
     } // Fl_Tabs* cluster_tabs
+    o->resizable(cluster_tabs);
+    o->size_range(680,420,0,0);
     o->end();
   } // Fl_Double_Window* o
   return w;

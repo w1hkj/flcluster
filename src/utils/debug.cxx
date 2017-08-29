@@ -35,6 +35,10 @@
 #include <time.h>
 #include <pthread.h>
 
+#include <queue>
+
+#include <sys/time.h>
+
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Slider.H>
@@ -49,31 +53,23 @@
 #include "gettext.h"
 #include "flcluster.h"
 
+#include "threads.h"
+
 using namespace std;
 
 #define MAX_LINES 65536
 
-static FILE* wfile;
-static FILE* rfile;
-static int rfd;
-
-static Fl_Double_Window*	window;
-static Fl_Browser*			btext;
-static string dbg_buffer;
+static queue<string>dbg_buffers;
 
 debug* debug::inst = 0;
+
+//debug::level_e debug::level = debug::INFO_LEVEL;
 debug::level_e debug::level = debug::INFO_LEVEL;
-//debug::level_e debug::level = debug::DEBUG_LEVEL;
 uint32_t debug::mask = ~0u;
 
 const char* prefix[] = { _("Quiet"), _("Error"), _("Warning"), _("Info"), _("Debug") };
 
 pthread_mutex_t mutex_log = PTHREAD_MUTEX_INITIALIZER;
-
-static void slider_cb(Fl_Widget* w, void*);
-static void clear_cb(Fl_Widget *w, void*);
-static void save_cb(Fl_Widget *w, void*);
-static void synctext(void *);
 
 /** ********************************************************
  *
@@ -98,196 +94,92 @@ int strlen_n(char *buf, size_t limit)
 /** ********************************************************
  *
  ***********************************************************/
+static string fname;
+
 void debug::start(const char* filename)
 {
 	if (debug::inst)
 		return;
-	inst = new debug(filename);
+	fname = filename;
+	debug::inst = new debug(fname.c_str());
 
-	window = new Fl_Double_Window(600, 256, _("Debug log"));
-
-	int pad = 2;
-
-	Fl_Slider* slider = new Fl_Slider(pad, pad, 128, 20, prefix[level]);
-	slider->tooltip(_("Change log level"));
-	slider->align(FL_ALIGN_RIGHT);
-	slider->type(FL_HOR_NICE_SLIDER);
-	slider->range(0.0, LOG_NLEVELS - 1);
-	slider->step(1.0);
-	slider->value(level);
-	slider->callback(slider_cb);
-
-	Fl_Button* savebtn  = new Fl_Button(window->w() - 124, pad, 60, 20, "save");
-	savebtn->callback(save_cb);
-
-	Fl_Button* clearbtn = new Fl_Button(window->w() - 60, pad, 60, 20, "clear");
-	clearbtn->callback(clear_cb);
-
-	btext = new Fl_Browser(pad,  slider->h()+pad, window->w()-2*pad, window->h()-slider->h()-2*pad, 0);
-	btext->textfont(FL_COURIER);
-	window->resizable(btext);
-
-	dbg_buffer.clear();
-
-	window->end();
+	while (!dbg_buffers.empty()) dbg_buffers.pop();
 }
 
 /** ********************************************************
  *
  ***********************************************************/
-void debug::stop(void)
-{
-	delete inst;
-	inst = 0;
-	delete window;
-}
+//void debug::stop(void)
+//{
+//}
 
 static char fmt[1024];
 static char sztemp[1024];
-static string estr = "";
-bool   debug_in_use = false;
+static char strTime[64];
 
 /** ********************************************************
  *
  ***********************************************************/
+static void append_to_file(void *)
+{
+	guard_lock gl (&mutex_log);
+
+	if (fname.empty()) {
+		while (!dbg_buffers.empty()) {
+			std::cout << dbg_buffers.front();
+			dbg_buffers.pop();
+		}
+		return;
+	}
+
+	ofstream afile(fname.c_str(), ios::app);
+	if (!afile) {
+		while (!dbg_buffers.empty()) dbg_buffers.pop();
+		return;
+	}
+
+	while (!dbg_buffers.empty()) {
+		afile << dbg_buffers.front();
+		std::cout << dbg_buffers.front();
+		dbg_buffers.pop();
+	}
+}
+
+/** ********************************************************
+ *
+ ***********************************************************/
+static char ztbuf[20] = "12:30:00";
+
 void debug::log(level_e level, const char* func, const char* srcf, int line, const char* format, ...)
 {
 	if (!inst)
 		return;
 
-	pthread_mutex_lock(&mutex_log);
+	guard_lock gl (&mutex_log);
 
-	snprintf(fmt, sizeof(fmt), "%c: %s: %s\n", *prefix[level], func, format);
+	struct tm tm;
+	time_t t_temp;
+	struct timeval tv;
 
-	while(debug_in_use) MilliSleep(10);
+	gettimeofday(&tv, NULL);
 
-	va_list args;
-	va_start(args, format);
+	t_temp=(time_t)tv.tv_sec;
+	gmtime_r(&t_temp, &tm);
+	memset(ztbuf, 0, sizeof(ztbuf));
+	strftime(ztbuf, sizeof(ztbuf), "%H:%M:%S", &tm);
 
-	vsnprintf(sztemp, sizeof(sztemp), fmt, args);
-	estr.append(sztemp);
-
-	va_end(args);
-
-	fprintf(wfile, "%s", sztemp);
-	fflush(wfile);
-
-	append_dbg_buffer(sztemp);
-
-	pthread_mutex_unlock(&mutex_log);
-
-	Fl::awake(synctext, 0);
-	MilliSleep(10);
-}
-
-/** ********************************************************
- *
- ***********************************************************/
-void debug::slog(level_e level, const char* func, const char* srcf, int line, const char* format, ...)
-{
-	if (!inst)
-		return;
-
-	pthread_mutex_lock(&mutex_log);
-
-	snprintf(fmt, sizeof(fmt), "%c:%s\n", *prefix[level], format);
-
-	while(debug_in_use) MilliSleep(10);
+	snprintf(fmt, sizeof(fmt), "%s [%c] %s: %s\n", ztbuf, *prefix[level], func, format);
 
 	va_list args;
 	va_start(args, format);
 
 	vsnprintf(sztemp, sizeof(sztemp), fmt, args);
-	estr.append(sztemp);
 
 	va_end(args);
-	fflush(wfile);
 
-	pthread_mutex_unlock(&mutex_log);
+	dbg_buffers.push(sztemp);
 
-	Fl::awake(synctext, 0);
-	MilliSleep(10);
-}
-
-/** ********************************************************
- *
- ***********************************************************/
-void debug::elog(const char* func, const char* srcf, int line, const char* text)
-{
-	log(ERROR_LEVEL, func, srcf, line, "%s: %s", text, strerror(errno));
-}
-
-/** ********************************************************
- *
- ***********************************************************/
-void debug::show(void)
-{
-	window->show();
-}
-
-/** ********************************************************
- *
- ***********************************************************/
-void debug::sync_text(void *arg)
-{
-	debug_in_use = true;
-	size_t p0 = 0, p1 = estr.find('\n');
-	while (p1 != string::npos) {
-		btext->insert(1, estr.substr(p0,p1-p0).c_str());
-		dbg_buffer.append(estr.substr(p0, p1 - p0)).append("\n");
-		p0 = p1 + 1;
-		p1 = estr.find('\n', p0);
-	}
-	estr = "";
-	debug_in_use = false;
-}
-
-/** ********************************************************
- *
- ***********************************************************/
-void debug::append_dbg_buffer(char * message)
-{
-	debug_in_use = true;
-	std::string msg;
-	char strTime[64];
-	char *cPtr = (char *)0;
-	int len = 0;
-	int index = 0;
-	int strIndex = 0;
-	time_t current_time = 0;
-
-	if(!message) return;
-
-	msg.assign(message);
-
-	if(msg.size() < 1) return;
-
-	size_t p1 = msg.find('\n');
-
-	if(p1 == string::npos) {
-		msg.append("\n");
-	}
-
-	memset(strTime, 0, sizeof(strTime));
-	current_time = time(0);
-	cPtr = ctime(&current_time);
-
-	len = strlen_n(cPtr, sizeof(strTime) - 1);
-
-	if(len) {
-		strIndex = 0;
-		for(index = 0; index < len; index++) {
-			if(cPtr[index] == '\r' || cPtr[index] == '\n')
-				strTime[strIndex++] = 0;
-			else
-				strTime[strIndex++] = cPtr[index];
-		}
-		dbg_buffer.append(strTime).append("  ");
-	}
-
-	dbg_buffer.append(msg);
-
-	debug_in_use = false;
+	Fl::awake(append_to_file);
 }
 
 /** ********************************************************
@@ -295,20 +187,8 @@ void debug::append_dbg_buffer(char * message)
  ***********************************************************/
 debug::debug(const char* filename)
 {
-	if ((wfile = fopen(filename, "w")) == NULL)
-		throw strerror(errno);
-	setvbuf(wfile, (char*)NULL, _IOLBF, 0);
-
-	if ((rfile = fopen(filename, "r")) == NULL)
-		throw strerror(errno);
-	rfd = fileno(rfile);
-#ifndef __WIN32__
-	int f;
-	if ((f = fcntl(rfd, F_GETFL)) == -1)
-		throw strerror(errno);
-	if (fcntl(rfd, F_SETFL, f | O_NONBLOCK) == -1)
-		throw strerror(errno);
-#endif
+	ofstream wfile(filename, ios::out);
+	if (!wfile) throw strerror(errno);
 }
 
 /** ********************************************************
@@ -316,56 +196,4 @@ debug::debug(const char* filename)
  ***********************************************************/
 debug::~debug()
 {
-	fclose(wfile);
-	fclose(rfile);
-}
-
-/** ********************************************************
- *
- ***********************************************************/
-static void synctext(void *d)
-{
-	debug_in_use = true;
-	size_t p0 = 0, p1 = estr.find('\n');
-	while (p1 != string::npos) {
-		btext->insert(1, estr.substr(p0,p1-p0).c_str());
-		p0 = p1 + 1;
-		p1 = estr.find('\n', p0);
-	}
-	estr = "";
-	debug_in_use = false;
-}
-
-/** ********************************************************
- *
- ***********************************************************/
-static void slider_cb(Fl_Widget* w, void*)
-{
-	debug::level = (debug::level_e)((Fl_Slider*)w)->value();
-	w->label(prefix[debug::level]);
-	w->parent()->redraw();
-}
-
-/** ********************************************************
- *
- ***********************************************************/
-static void clear_cb(Fl_Widget* w, void*)
-{
-	btext->clear();
-	dbg_buffer.clear();
-}
-
-/** ********************************************************
- *
- ***********************************************************/
-static void save_cb(Fl_Widget* w, void*)
-{
-	if (!btext->size()) return;
-	string filename = HOME_DIR;
-	filename.append("events.txt");
-	ofstream out;
-	out.open(filename.c_str(), ios::app);
-	out << dbg_buffer;
-	out.close();
-	fl_alert2("Saved in %s", filename.c_str());
 }

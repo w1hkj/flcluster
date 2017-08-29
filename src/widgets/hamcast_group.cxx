@@ -1,7 +1,7 @@
 /** **************************************************************
  \page hamcast_group Hamcast_Group Subclass of Fl_Group
 
- \par hamcast_group.cxx (FLAMP)
+ \par hamcast_group.cxx (FLCLUSTER)
 
  \par Author(s):
  Robert Stiles, KK5VD, Copyright &copy; 2014
