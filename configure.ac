@@ -9,9 +9,9 @@ AC_PREREQ([2.63])
 
 dnl major and minor must be integers; patch may
 dnl contain other characters or be empty
-m4_define(FLCLUSTER_MAJOR,  [0])
-m4_define(FLCLUSTER_MINOR,  [9])
-m4_define(FLCLUSTER_PATCH,  [.00])
+m4_define(FLCLUSTER_MAJOR,  [1])
+m4_define(FLCLUSTER_MINOR,  [0])
+m4_define(FLCLUSTER_PATCH,  [.0])
 
 AC_INIT([FLcluster], FLCLUSTER_MAJOR.FLCLUSTER_MINOR[]FLCLUSTER_PATCH, [w1hkj AT w1hkj DOT com])
 
