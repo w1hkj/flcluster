@@ -57,13 +57,14 @@ extern void dxcluster_hosts_clear_setup(Fl_Button*, void*);
 extern void dxcluster_hosts_load_setup(Fl_Button*, void*);
 extern void dxcluster_hosts_save_setup(Fl_Button*, void*);
 extern void dxcluster_hosts_send_setup(Fl_Button*, void*);
-extern void dxcluster_ccc_help(Fl_Button*, void*);
+extern void dxcluster_chelp(Fl_Button*, void*);
 extern void dxcluster_arc_help(Fl_Button*, void*);
 extern void dxcluster_dxc_help(Fl_Button*, void*);
 extern void dxcluser_servers(Fl_Button*, void*);
 extern void dxcluster_hosts_load();
 
 extern void dxc_lines();
+extern void dxc_column_widths();
 
 extern void dxc_click_m1(Fl_Button*, void*);
 extern void dxc_click_m2(Fl_Button*, void*);
@@ -74,30 +75,56 @@ extern void dxc_click_m6(Fl_Button*, void*);
 extern void dxc_click_m7(Fl_Button*, void*);
 extern void dxc_click_m8(Fl_Button*, void*);
 
+extern void send_name();
+extern void send_qth();
+extern void send_qra();
+
 struct dxinfo {
-	std::string  spotter;
-	std::string  freq;
-	std::string  dxcall;
-	std::string  remark;
-	std::string  time;
-	std::string  info;
-	std::string  state;
-	std::string  country;
-	std::string  toall;
-	bool    dx;
+	string freq;
+	string call;
+	string date;
+	string time;
+	string comment;
+	string spotter;
+	string call_country_code;
+	string spotter_country_code;
+	string originating_node;
+	string call_itu_zone;
+	string call_cq_zone;
+	string spotter_itu_zone;
+	string spotter_cq_zone;
+	string call_US_state;
+	string spotter_US_state;
+	string call_country_text;
+	string spotter_country_text;
+	string call_grid_square;
+	string spotter_grid_square;
+
 	dxinfo() { clear(); } 
 	void clear() {
-		spotter.clear();
 		freq.clear();
-		dxcall.clear();
-		remark.clear();
+		call.clear();
+		date.clear();
 		time.clear();
-		info.clear();
-		country.clear();
-		toall.clear();
-		dx = false;
+		comment.clear();
+		spotter.clear();
+		call_country_code.clear();
+		spotter_country_code.clear();
+		originating_node.clear();
+		call_itu_zone.clear();
+		call_cq_zone.clear();
+		spotter_itu_zone.clear();
+		spotter_cq_zone.clear();
+		call_US_state.clear();
+		spotter_US_state.clear();
+		call_country_text.clear();
+		spotter_country_text.clear();
+		call_grid_square.clear();
+		spotter_grid_square.clear();
 	}
 	~dxinfo() {}
 };
+
+extern bool dx_stream;
 
 #endif

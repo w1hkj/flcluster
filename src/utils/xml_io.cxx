@@ -40,8 +40,9 @@ using XmlRpc::XmlRpcValue;
 struct DX_STA {
 	std::string call;
 	long freq;
-	DX_STA() { call = ""; freq = 0;}
-	DX_STA(std::string c, int f) { call = c; freq = f;}
+	std::string mode;
+	DX_STA() { call = ""; freq = 0; mode = "BPSK31"; }
+	DX_STA(std::string c, int f, std::string md) { call = c; freq = f; mode = md;}
 };
 
 std::queue<DX_STA> dx_stas;
@@ -56,6 +57,7 @@ static const char *log_set_call = "log.set_call";
 static const char *log_get_call = "log.get_call";
 
 static const char *modem_get_name = "modem.get_name";
+static const char *modem_set_by_name = "modem.set_by_name";
 
 static XmlRpc::XmlRpcClient* client;
 
@@ -115,14 +117,27 @@ static void send_new_call(std::string call)
 	}
 }
 
+static void send_new_mode(std::string mode)
+{
+	if (!fldigi_online) return;
+	try {
+		XmlRpcValue c((std::string)mode), res;
+		execute(modem_set_by_name, c, res);
+	}
+	catch (const XmlRpc::XmlRpcException& e) {
+	}
+	catch (const char *) {
+	}
+}
+
 // add mutex for frequency queu
 
-void send_xml_dx_sta(std::string call, long freq)
+void send_xml_dx_sta(std::string call, long freq, std::string mode)
 {
 	if (!fldigi_online) return;
 	guard_lock gl(&send_queue_mutex);
 
-	dx_stas.push( DX_STA(call, freq));
+	dx_stas.push( DX_STA(call, freq, mode));
 }
 
 void send_queue()
@@ -132,6 +147,7 @@ void send_queue()
 		guard_lock gl(&send_queue_mutex);
 		send_new_call(dx_stas.front().call);
 		send_new_freq(dx_stas.front().freq);
+		send_new_mode(dx_stas.front().mode);
 		dx_stas.pop();
 	}
 }

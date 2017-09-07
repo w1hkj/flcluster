@@ -227,6 +227,13 @@ Fl_Output *txtTOD=(Fl_Output *)0;
 
 Fl_Box *box_keepalive=(Fl_Box *)0;
 
+Fl_Button *btn_dxc_cluster_align=(Fl_Button *)0;
+
+static void cb_btn_dxc_cluster_align(Fl_Button*, void*) {
+  //dxc_lines();
+dxc_column_widths();
+}
+
 Fl_Group *tabDXclusterConfig=(Fl_Group *)0;
 
 Fl_Group *cc_resize_1=(Fl_Group *)0;
@@ -532,6 +539,24 @@ static void cb_inp_myLocator(Fl_Input* o, void*) {
   progStatus.myLocator = o->value();
 }
 
+Fl_Button *btn_send_name=(Fl_Button *)0;
+
+static void cb_btn_send_name(Fl_Button*, void*) {
+  send_name();
+}
+
+Fl_Button *btn_send_qth=(Fl_Button *)0;
+
+static void cb_btn_send_qth(Fl_Button*, void*) {
+  send_qth();
+}
+
+Fl_Button *btn_send_qra=(Fl_Button *)0;
+
+static void cb_btn_send_qra(Fl_Button*, void*) {
+  send_qra();
+}
+
 Fl_Output *DXC_display=(Fl_Output *)0;
 
 Fl_Button *btn_DXC_font=(Fl_Button *)0;
@@ -698,13 +723,14 @@ dxcluster_hosts_load();
 font_browser->hide();
 }
 
-Fl_Group *gp_resize_uc=(Fl_Group *)0;
+Fl_Round_Button *btn_zero_keepalive=(Fl_Round_Button *)0;
 
-Fl_Check_Button *btn_tooltips=(Fl_Check_Button *)0;
-
-static void cb_btn_tooltips(Fl_Check_Button* o, void*) {
-  progStatus.tooltips=o->value();
-Fl_Tooltip::enable(progStatus.tooltips);
+static void cb_btn_zero_keepalive(Fl_Round_Button* o, void*) {
+  progStatus.keepalive = 0;
+o->value(1);
+btn_one_keepalive->value(0);
+btn_five_keepalive->value(0);
+btn_ten_keepalive->value(0);
 }
 
 Fl_Round_Button *btn_one_keepalive=(Fl_Round_Button *)0;
@@ -712,6 +738,7 @@ Fl_Round_Button *btn_one_keepalive=(Fl_Round_Button *)0;
 static void cb_btn_one_keepalive(Fl_Round_Button* o, void*) {
   progStatus.keepalive = 1;
 o->value(1);
+btn_zero_keepalive->value(0);
 btn_five_keepalive->value(0);
 btn_ten_keepalive->value(0);
 }
@@ -721,6 +748,7 @@ Fl_Round_Button *btn_five_keepalive=(Fl_Round_Button *)0;
 static void cb_btn_five_keepalive(Fl_Round_Button* o, void*) {
   progStatus.keepalive = 5;
 o->value(1);
+btn_zero_keepalive->value(0);
 btn_one_keepalive->value(0);
 btn_ten_keepalive->value(0);
 }
@@ -730,9 +758,21 @@ Fl_Round_Button *btn_ten_keepalive=(Fl_Round_Button *)0;
 static void cb_btn_ten_keepalive(Fl_Round_Button* o, void*) {
   progStatus.keepalive = 10;
 o->value(1);
+btn_zero_keepalive->value(0);
 btn_one_keepalive->value(0);
 btn_five_keepalive->value(0);
 }
+
+Fl_Group *grp_misc=(Fl_Group *)0;
+
+Fl_Check_Button *btn_tooltips=(Fl_Check_Button *)0;
+
+static void cb_btn_tooltips(Fl_Check_Button* o, void*) {
+  progStatus.tooltips=o->value();
+Fl_Tooltip::enable(progStatus.tooltips);
+}
+
+Fl_Group *grp_resize_uc=(Fl_Group *)0;
 
 Fl_Group *tabDXclusterHelp=(Fl_Group *)0;
 
@@ -946,12 +986,12 @@ Fl_Double_Window* dxc_window() {
       } // Fl_Group* tabDXclusterTelNetStream
       { Fl_Group* o = tabDXclusterReports = new Fl_Group(0, 100, 680, 314, _("DX Reports"));
         tabDXclusterReports->hide();
-        { reports_header = new Fl_Browser(3, 104, 671, 20);
+        { reports_header = new Fl_Browser(3, 104, 671, 22);
           reports_header->color(FL_LIGHT2);
           reports_header->textfont(4);
           reports_header->when(FL_WHEN_NEVER);
         } // Fl_Browser* reports_header
-        { brws_dx_cluster = new Fl_Browser(3, 124, 671, 260);
+        { brws_dx_cluster = new Fl_Browser(3, 126, 671, 260);
           brws_dx_cluster->tooltip(_("Left Click to select SPOT"));
           brws_dx_cluster->type(2);
           brws_dx_cluster->textfont(4);
@@ -959,11 +999,11 @@ Fl_Double_Window* dxc_window() {
           brws_dx_cluster->align(Fl_Align(FL_ALIGN_BOTTOM|FL_ALIGN_INSIDE));
           Fl_Group::current()->resizable(brws_dx_cluster);
         } // Fl_Browser* brws_dx_cluster
-        { btn_dxc_cluster_clear = new Fl_Button(294, 390, 72, 22, _("Clear"));
+        { btn_dxc_cluster_clear = new Fl_Button(328, 390, 72, 22, _("Clear"));
           btn_dxc_cluster_clear->tooltip(_("Clear parsed data stream"));
           btn_dxc_cluster_clear->callback((Fl_Callback*)cb_btn_dxc_cluster_clear);
         } // Fl_Button* btn_dxc_cluster_clear
-        { Fl_Check_Button* o = brws_order = new Fl_Check_Button(31, 391, 186, 15, _("New entries in first line"));
+        { Fl_Check_Button* o = brws_order = new Fl_Check_Button(31, 393, 186, 15, _("New entries in first line"));
           brws_order->down_box(FL_DOWN_BOX);
           brws_order->callback((Fl_Callback*)cb_brws_order);
           brws_order->when(FL_WHEN_CHANGED);
@@ -978,6 +1018,10 @@ Fl_Double_Window* dxc_window() {
         { box_keepalive = new Fl_Box(450, 392, 18, 18);
           box_keepalive->box(FL_DIAMOND_DOWN_BOX);
         } // Fl_Box* box_keepalive
+        { btn_dxc_cluster_align = new Fl_Button(221, 390, 84, 22, _("Align Cols"));
+          btn_dxc_cluster_align->tooltip(_("Align columns after dialog resize"));
+          btn_dxc_cluster_align->callback((Fl_Callback*)cb_btn_dxc_cluster_align);
+        } // Fl_Button* btn_dxc_cluster_align
         o->resizable(brws_dx_cluster);
         tabDXclusterReports->end();
       } // Fl_Group* tabDXclusterReports
@@ -1353,109 +1397,137 @@ Fl_Double_Window* dxc_window() {
         o->resizable(gp_resize_io);
         tabIOconfig->end();
       } // Fl_Group* tabIOconfig
-      { Fl_Group* o = tabUserConfig = new Fl_Group(0, 100, 680, 314, _("User Config"));
+      { Fl_Group* o = tabUserConfig = new Fl_Group(0, 100, 680, 315, _("User Config"));
         tabUserConfig->hide();
-        { Fl_Input* o = inp_myCall = new Fl_Input(34, 119, 90, 24, _("myCall"));
-          inp_myCall->callback((Fl_Callback*)cb_inp_myCall);
-          inp_myCall->align(Fl_Align(FL_ALIGN_RIGHT));
-          inp_myCall->when(FL_WHEN_CHANGED);
-          o->value(progStatus.myCall.c_str());
-        } // Fl_Input* inp_myCall
-        { Fl_Input* o = inp_myName = new Fl_Input(34, 151, 90, 24, _("myName"));
-          inp_myName->callback((Fl_Callback*)cb_inp_myName);
-          inp_myName->align(Fl_Align(FL_ALIGN_RIGHT));
-          inp_myName->when(FL_WHEN_CHANGED);
-          o->value(progStatus.myName.c_str());
-        } // Fl_Input* inp_myName
-        { Fl_Input* o = inp_myQth = new Fl_Input(34, 183, 160, 24, _("myQth"));
-          inp_myQth->callback((Fl_Callback*)cb_inp_myQth);
-          inp_myQth->align(Fl_Align(FL_ALIGN_RIGHT));
-          inp_myQth->when(FL_WHEN_CHANGED);
-          o->value(progStatus.myQth.c_str());
-        } // Fl_Input* inp_myQth
-        { Fl_Input* o = inp_myLocator = new Fl_Input(34, 216, 90, 24, _("myLocator"));
-          inp_myLocator->callback((Fl_Callback*)cb_inp_myLocator);
-          inp_myLocator->align(Fl_Align(FL_ALIGN_RIGHT));
-          inp_myLocator->when(FL_WHEN_CHANGED);
-          o->value(progStatus.myLocator.c_str());
-        } // Fl_Input* inp_myLocator
-        { Fl_Group* o = new Fl_Group(54, 248, 587, 137);
+        { Fl_Group* o = new Fl_Group(5, 106, 315, 160, _("Personal Info"));
+          o->box(FL_ENGRAVED_BOX);
+          o->align(Fl_Align(FL_ALIGN_TOP|FL_ALIGN_INSIDE));
+          { Fl_Input* o = inp_myCall = new Fl_Input(71, 135, 160, 22, _("Call"));
+            inp_myCall->callback((Fl_Callback*)cb_inp_myCall);
+            inp_myCall->when(FL_WHEN_CHANGED);
+            o->value(progStatus.myCall.c_str());
+          } // Fl_Input* inp_myCall
+          { Fl_Input* o = inp_myName = new Fl_Input(71, 167, 160, 22, _("Name"));
+            inp_myName->callback((Fl_Callback*)cb_inp_myName);
+            inp_myName->when(FL_WHEN_CHANGED);
+            o->value(progStatus.myName.c_str());
+          } // Fl_Input* inp_myName
+          { Fl_Input* o = inp_myQth = new Fl_Input(71, 199, 160, 22, _("Qth"));
+            inp_myQth->callback((Fl_Callback*)cb_inp_myQth);
+            inp_myQth->when(FL_WHEN_CHANGED);
+            o->value(progStatus.myQth.c_str());
+          } // Fl_Input* inp_myQth
+          { Fl_Input* o = inp_myLocator = new Fl_Input(71, 232, 160, 22, _("Locator"));
+            inp_myLocator->callback((Fl_Callback*)cb_inp_myLocator);
+            inp_myLocator->when(FL_WHEN_CHANGED);
+            o->value(progStatus.myLocator.c_str());
+          } // Fl_Input* inp_myLocator
+          { btn_send_name = new Fl_Button(243, 167, 70, 22, _("Update"));
+            btn_send_name->tooltip(_("update change to server"));
+            btn_send_name->callback((Fl_Callback*)cb_btn_send_name);
+          } // Fl_Button* btn_send_name
+          { btn_send_qth = new Fl_Button(243, 199, 70, 22, _("Update"));
+            btn_send_qth->tooltip(_("update change to server"));
+            btn_send_qth->callback((Fl_Callback*)cb_btn_send_qth);
+          } // Fl_Button* btn_send_qth
+          { btn_send_qra = new Fl_Button(243, 232, 70, 22, _("Update"));
+            btn_send_qra->tooltip(_("update change to server"));
+            btn_send_qra->callback((Fl_Callback*)cb_btn_send_qra);
+          } // Fl_Button* btn_send_qra
+          o->end();
+        } // Fl_Group* o
+        { Fl_Group* o = new Fl_Group(5, 268, 670, 137);
           o->box(FL_ENGRAVED_FRAME);
           o->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
-          { Fl_Output* o = DXC_display = new Fl_Output(73, 273, 184, 25, _("Report Browser"));
+          { Fl_Output* o = DXC_display = new Fl_Output(24, 293, 184, 25, _("Report Browser"));
             DXC_display->align(Fl_Align(FL_ALIGN_TOP_LEFT));
             o->textfont(progStatus.DXC_textfont);o->textsize(progStatus.DXC_textsize);
             o->value("DX de W1HKJ-1");
             o->redraw();
           } // Fl_Output* DXC_display
-          { btn_DXC_font = new Fl_Button(262, 273, 86, 25, _("Font"));
+          { btn_DXC_font = new Fl_Button(213, 293, 86, 25, _("Font"));
             btn_DXC_font->callback((Fl_Callback*)cb_btn_DXC_font);
           } // Fl_Button* btn_DXC_font
-          { btnDXCdefault_colors_font = new Fl_Button(354, 273, 86, 25, _("Default"));
+          { btnDXCdefault_colors_font = new Fl_Button(305, 293, 86, 25, _("Default"));
             btnDXCdefault_colors_font->callback((Fl_Callback*)cb_btnDXCdefault_colors_font);
           } // Fl_Button* btnDXCdefault_colors_font
-          { Fl_Button* o = btn_DXC_even_lines = new Fl_Button(262, 304, 86, 25, _("Even Lines"));
+          { Fl_Button* o = btn_DXC_even_lines = new Fl_Button(213, 324, 86, 25, _("Even Lines"));
             btn_DXC_even_lines->color((Fl_Color)55);
             btn_DXC_even_lines->callback((Fl_Callback*)cb_btn_DXC_even_lines);
             o->color(progStatus.DXC_even_color);
           } // Fl_Button* btn_DXC_even_lines
-          { Fl_Button* o = btn_DXC_odd_lines = new Fl_Button(354, 304, 86, 25, _("Odd Lines"));
+          { Fl_Button* o = btn_DXC_odd_lines = new Fl_Button(305, 324, 86, 25, _("Odd Lines"));
             btn_DXC_odd_lines->color((Fl_Color)246);
             btn_DXC_odd_lines->callback((Fl_Callback*)cb_btn_DXC_odd_lines);
             o->color(progStatus.DXC_odd_color);
           } // Fl_Button* btn_DXC_odd_lines
-          { Fl_Input* o = StreamText = new Fl_Input(73, 343, 184, 25, _("Stream Text"));
+          { Fl_Input* o = StreamText = new Fl_Input(24, 363, 184, 25, _("Stream Text"));
             StreamText->align(Fl_Align(FL_ALIGN_TOP_LEFT));
             o->value("DX de W1HKJ...");
             o->color(fl_rgb_color(progStatus.DX_Color_R, progStatus.DX_Color_G, progStatus.DX_Color_B));
             o->textfont(progStatus.DXfontnbr); o->textsize(progStatus.DXfontsize); o->textcolor(progStatus.DXfontcolor);
           } // Fl_Input* StreamText
-          { btnDXcolor = new Fl_Button(262, 343, 86, 25, _("Bg color"));
+          { btnDXcolor = new Fl_Button(213, 363, 86, 25, _("Bg color"));
             btnDXcolor->callback((Fl_Callback*)cb_btnDXcolor);
           } // Fl_Button* btnDXcolor
-          { btnDXfont = new Fl_Button(354, 343, 86, 25, _("Font"));
+          { btnDXfont = new Fl_Button(305, 363, 86, 25, _("Font"));
             btnDXfont->callback((Fl_Callback*)cb_btnDXfont);
           } // Fl_Button* btnDXfont
-          { Fl_Button* o = btnDXalt_color = new Fl_Button(446, 342, 86, 25, _("Alt Color"));
+          { Fl_Button* o = btnDXalt_color = new Fl_Button(397, 362, 86, 25, _("Alt Color"));
             btnDXalt_color->tooltip(_("Color for outgoing telnet text"));
             btnDXalt_color->callback((Fl_Callback*)cb_btnDXalt_color);
             o->labelcolor(progStatus.DXalt_color);
           } // Fl_Button* btnDXalt_color
-          { btnDXdefault_colors_font = new Fl_Button(540, 342, 86, 25, _("Default"));
+          { btnDXdefault_colors_font = new Fl_Button(491, 362, 86, 25, _("Default"));
             btnDXdefault_colors_font->callback((Fl_Callback*)cb_btnDXdefault_colors_font);
           } // Fl_Button* btnDXdefault_colors_font
           o->end();
         } // Fl_Group* o
-        { gp_resize_uc = new Fl_Group(7, 388, 664, 15);
-          gp_resize_uc->end();
-        } // Fl_Group* gp_resize_uc
-        { Fl_Check_Button* o = btn_tooltips = new Fl_Check_Button(487, 123, 78, 15, _("Enable Tooltips"));
-          btn_tooltips->down_box(FL_DOWN_BOX);
-          btn_tooltips->value(1);
-          btn_tooltips->callback((Fl_Callback*)cb_btn_tooltips);
-          o->value(progStatus.tooltips);
-        } // Fl_Check_Button* btn_tooltips
-        { Fl_Group* o = new Fl_Group(275, 120, 170, 115, _("Keepalive signal"));
+        { Fl_Group* o = new Fl_Group(325, 106, 175, 160, _("Keepalive signal"));
           o->box(FL_ENGRAVED_BOX);
           o->align(Fl_Align(FL_ALIGN_TOP|FL_ALIGN_INSIDE));
-          { Fl_Round_Button* o = btn_one_keepalive = new Fl_Round_Button(285, 152, 151, 20, _("every minute"));
+          { Fl_Round_Button* o = btn_zero_keepalive = new Fl_Round_Button(340, 138, 151, 26, _("never"));
+            btn_zero_keepalive->tooltip(_("disable keep alive signal"));
+            btn_zero_keepalive->down_box(FL_ROUND_DOWN_BOX);
+            btn_zero_keepalive->callback((Fl_Callback*)cb_btn_zero_keepalive);
+            o->value(progStatus.keepalive == 0);
+          } // Fl_Round_Button* btn_zero_keepalive
+          { Fl_Round_Button* o = btn_one_keepalive = new Fl_Round_Button(340, 166, 151, 26, _("every minute"));
+            btn_one_keepalive->tooltip(_("send keepalive signal every minute"));
             btn_one_keepalive->down_box(FL_ROUND_DOWN_BOX);
             btn_one_keepalive->callback((Fl_Callback*)cb_btn_one_keepalive);
             o->value(progStatus.keepalive == 1);
           } // Fl_Round_Button* btn_one_keepalive
-          { Fl_Round_Button* o = btn_five_keepalive = new Fl_Round_Button(285, 175, 151, 20, _("every 5 minutes"));
+          { Fl_Round_Button* o = btn_five_keepalive = new Fl_Round_Button(340, 194, 151, 26, _("every 5 minutes"));
+            btn_five_keepalive->tooltip(_("send keepalive signal every 5 minutes"));
             btn_five_keepalive->down_box(FL_ROUND_DOWN_BOX);
             btn_five_keepalive->callback((Fl_Callback*)cb_btn_five_keepalive);
             o->value(progStatus.keepalive == 5);
           } // Fl_Round_Button* btn_five_keepalive
-          { Fl_Round_Button* o = btn_ten_keepalive = new Fl_Round_Button(285, 198, 151, 20, _("every 10 minutes"));
+          { Fl_Round_Button* o = btn_ten_keepalive = new Fl_Round_Button(340, 224, 151, 25, _("every 10 minutes"));
+            btn_ten_keepalive->tooltip(_("send keepalive signal every 10 minutes"));
             btn_ten_keepalive->down_box(FL_ROUND_DOWN_BOX);
             btn_ten_keepalive->callback((Fl_Callback*)cb_btn_ten_keepalive);
             o->value(progStatus.keepalive == 10);
           } // Fl_Round_Button* btn_ten_keepalive
           o->end();
         } // Fl_Group* o
-        o->resizable(gp_resize_uc);
+        { grp_misc = new Fl_Group(505, 106, 170, 160, _("Miscellaneous"));
+          grp_misc->box(FL_ENGRAVED_BOX);
+          grp_misc->align(Fl_Align(FL_ALIGN_TOP|FL_ALIGN_INSIDE));
+          { Fl_Check_Button* o = btn_tooltips = new Fl_Check_Button(525, 143, 78, 15, _("Enable Tooltips"));
+            btn_tooltips->down_box(FL_DOWN_BOX);
+            btn_tooltips->value(1);
+            btn_tooltips->callback((Fl_Callback*)cb_btn_tooltips);
+            o->value(progStatus.tooltips);
+          } // Fl_Check_Button* btn_tooltips
+          grp_misc->end();
+        } // Fl_Group* grp_misc
+        { grp_resize_uc = new Fl_Group(5, 405, 670, 7);
+          grp_resize_uc->end();
+          Fl_Group::current()->resizable(grp_resize_uc);
+        } // Fl_Group* grp_resize_uc
+        o->resizable(grp_resize_uc);
         tabUserConfig->end();
       } // Fl_Group* tabUserConfig
       { Fl_Group* o = tabDXclusterHelp = new Fl_Group(0, 100, 680, 314, _("Cluster Help"));

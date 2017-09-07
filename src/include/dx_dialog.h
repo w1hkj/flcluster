@@ -57,6 +57,7 @@ extern Fl_Button *btn_cluster_spot2;
 #include <FL/Fl_Output.H>
 extern Fl_Output *txtTOD;
 extern Fl_Box *box_keepalive;
+extern Fl_Button *btn_dxc_cluster_align;
 extern Fl_Group *tabDXclusterConfig;
 extern Fl_Group *cc_resize_1;
 extern Fl_Browser *brws_dxcluster_hosts;
@@ -125,6 +126,9 @@ extern Fl_Input *inp_myCall;
 extern Fl_Input *inp_myName;
 extern Fl_Input *inp_myQth;
 extern Fl_Input *inp_myLocator;
+extern Fl_Button *btn_send_name;
+extern Fl_Button *btn_send_qth;
+extern Fl_Button *btn_send_qra;
 extern Fl_Output *DXC_display;
 #include "font_browser.h"
 extern Fl_Button *btn_DXC_font;
@@ -137,13 +141,15 @@ extern Fl_Button *btnDXcolor;
 extern Fl_Button *btnDXfont;
 extern Fl_Button *btnDXalt_color;
 extern Fl_Button *btnDXdefault_colors_font;
-extern Fl_Group *gp_resize_uc;
-#include <FL/Fl_Tooltip.H>
-extern Fl_Check_Button *btn_tooltips;
 #include <FL/Fl_Round_Button.H>
+extern Fl_Round_Button *btn_zero_keepalive;
 extern Fl_Round_Button *btn_one_keepalive;
 extern Fl_Round_Button *btn_five_keepalive;
 extern Fl_Round_Button *btn_ten_keepalive;
+extern Fl_Group *grp_misc;
+#include <FL/Fl_Tooltip.H>
+extern Fl_Check_Button *btn_tooltips;
+extern Fl_Group *grp_resize_uc;
 extern Fl_Group *tabDXclusterHelp;
 extern FTextView *brws_dxc_help;
 extern Fl_Button *btn_dxc_help_query;

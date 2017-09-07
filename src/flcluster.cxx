@@ -91,6 +91,8 @@ using namespace std;
 
 Fl_Double_Window *main_window = (Fl_Double_Window *)0;
 
+bool dx_stream = false;
+
 //! @brief Command line help string initialization
 const char *options[] = {
 	"Flcluster Unique Options",
@@ -103,6 +105,7 @@ const char *options[] = {
 	"               H:/hamstuff/folder-name",
 	"      Linux:   /home/<username>/folder-name",
 	"      OS X:    /home/<username>/folder-name",
+	"   --stream enable dx_stream.txt text stream",
 	"",
 	"  Note: Enclosing \"'s must be used when the path or file name",
 	"        contains spaces.",
@@ -244,6 +247,12 @@ int parse_args(int argc, char **argv, int& idx)
 		return 1;
 	}
 
+	if (strcasecmp(argv[idx], "--stream") == 0) {
+		dx_stream = true;
+		idx++;
+		return 1;
+	}
+
 	if (strcasecmp(argv[idx], "--help") == 0) {
 		int i = 0;
 		while (copyright[i] != NULL) {
@@ -264,6 +273,7 @@ int parse_args(int argc, char **argv, int& idx)
 		printf("Version: "VERSION"\n");
 		exit (0);
 	}
+
 	return 0;
 }
 

@@ -102,11 +102,11 @@ Function {dxc_window()} {open
   code {font_browser = new Font_Browser;} {}
   Fl_Window {} {
     label {DX Cluster Spotting} open
-    xywh {668 48 680 420} type Double resizable
+    xywh {872 24 680 420} type Double resizable
     code0 {o->resizable(cluster_tabs);}
     code1 {o->size_range(680,420,0,0);} visible
   } {
-    Fl_Menu_Bar {} {open selected
+    Fl_Menu_Bar {} {open
       xywh {0 0 680 22}
     } {
       Submenu mnuFile {
@@ -279,28 +279,28 @@ progStatus.changed = true;}
         }
       }
       Fl_Group tabDXclusterReports {
-        label {DX Reports}
+        label {DX Reports} open
         xywh {0 100 680 314} hide
         code0 {o->resizable(brws_dx_cluster);}
       } {
         Fl_Browser reports_header {
-          xywh {3 104 671 20} color 52 when 2 textfont 4
+          xywh {3 104 671 22} color 52 when 2 textfont 4
         }
         Fl_Browser brws_dx_cluster {
           callback {DXcluster_select();}
-          tooltip {Left Click to select SPOT} xywh {3 124 671 260} type Hold align 18 textfont 4 resizable
+          tooltip {Left Click to select SPOT} xywh {3 126 671 260} type Hold align 18 textfont 4 resizable
         }
         Fl_Button btn_dxc_cluster_clear {
           label Clear
           callback {brws_dx_cluster->clear();}
-          tooltip {Clear parsed data stream} xywh {294 390 72 22}
+          tooltip {Clear parsed data stream} xywh {328 390 72 22}
         }
         Fl_Check_Button brws_order {
           label {New entries in first line}
           callback {progStatus.dxc_topline = o->value();
 dxc_lines();
 progStatus.changed=true;}
-          xywh {31 391 186 15} down_box DOWN_BOX when 1
+          xywh {31 393 186 15} down_box DOWN_BOX when 1
           code0 {o->value(progStatus.dxc_topline);}
         }
         Fl_Button btn_cluster_spot2 {
@@ -314,9 +314,15 @@ progStatus.changed=true;}
         Fl_Box box_keepalive {
           xywh {450 392 18 18} box DIAMOND_DOWN_BOX
         }
+        Fl_Button btn_dxc_cluster_align {
+          label {Align Cols}
+          callback {//dxc_lines();
+dxc_column_widths();}
+          tooltip {Align columns after dialog resize} xywh {221 390 84 22}
+        }
       }
       Fl_Group tabDXclusterConfig {
-        label {Cluster Config} selected
+        label {Cluster Config} open selected
         tooltip {Initialization strings for telnet cluster host} xywh {0 100 680 314}
         code0 {o->resizable(cc_resize_1);}
       } {
@@ -563,7 +569,7 @@ progStatus.changed=true;}
         }
       }
       Fl_Group tabIOconfig {
-        label {I/O config}
+        label {I/O config} open
         xywh {0 100 680 315} hide
         code0 {o->resizable(gp_resize_io);}
       } {
@@ -692,39 +698,59 @@ if (progStatus.LSBCW) {
       }
       Fl_Group tabUserConfig {
         label {User Config} open
-        xywh {0 100 680 314} hide
-        code0 {o->resizable(gp_resize_uc);}
+        xywh {0 100 680 315} hide
+        code0 {o->resizable(grp_resize_uc);}
       } {
-        Fl_Input inp_myCall {
-          label myCall
-          callback {progStatus.myCall = o->value();}
-          xywh {34 119 90 24} align 8 when 1
-          code0 {o->value(progStatus.myCall.c_str());}
-        }
-        Fl_Input inp_myName {
-          label myName
-          callback {progStatus.myName = o->value();}
-          xywh {34 151 90 24} align 8 when 1
-          code0 {o->value(progStatus.myName.c_str());}
-        }
-        Fl_Input inp_myQth {
-          label myQth
-          callback {progStatus.myQth = o->value();}
-          xywh {34 183 160 24} align 8 when 1
-          code0 {o->value(progStatus.myQth.c_str());}
-        }
-        Fl_Input inp_myLocator {
-          label myLocator
-          callback {progStatus.myLocator = o->value();}
-          xywh {34 216 90 24} align 8 when 1
-          code0 {o->value(progStatus.myLocator.c_str());}
+        Fl_Group {} {
+          label {Personal Info} open
+          xywh {5 106 315 160} box ENGRAVED_BOX align 17
+        } {
+          Fl_Input inp_myCall {
+            label Call
+            callback {progStatus.myCall = o->value();}
+            xywh {71 135 160 22} when 1
+            code0 {o->value(progStatus.myCall.c_str());}
+          }
+          Fl_Input inp_myName {
+            label Name
+            callback {progStatus.myName = o->value();}
+            xywh {71 167 160 22} when 1
+            code0 {o->value(progStatus.myName.c_str());}
+          }
+          Fl_Input inp_myQth {
+            label Qth
+            callback {progStatus.myQth = o->value();}
+            xywh {71 199 160 22} when 1
+            code0 {o->value(progStatus.myQth.c_str());}
+          }
+          Fl_Input inp_myLocator {
+            label Locator
+            callback {progStatus.myLocator = o->value();}
+            xywh {71 232 160 22} when 1
+            code0 {o->value(progStatus.myLocator.c_str());}
+          }
+          Fl_Button btn_send_name {
+            label Update
+            callback {send_name();}
+            tooltip {update change to server} xywh {243 167 70 22}
+          }
+          Fl_Button btn_send_qth {
+            label Update
+            callback {send_qth();}
+            tooltip {update change to server} xywh {243 199 70 22}
+          }
+          Fl_Button btn_send_qra {
+            label Update
+            callback {send_qra();}
+            tooltip {update change to server} xywh {243 232 70 22}
+          }
         }
         Fl_Group {} {open
-          xywh {54 248 587 137} box ENGRAVED_FRAME align 21
+          xywh {5 268 670 137} box ENGRAVED_FRAME align 21
         } {
           Fl_Output DXC_display {
             label {Report Browser}
-            xywh {73 273 184 25} align 5
+            xywh {24 293 184 25} align 5
             code0 {o->textfont(progStatus.DXC_textfont);o->textsize(progStatus.DXC_textsize);}
             code2 {o->value("DX de W1HKJ-1");}
             code3 {o->redraw();}
@@ -737,7 +763,7 @@ font_browser->fontColor(progStatus.DXC_textcolor);
 font_browser->fontFilter(Font_Browser::FIXED_WIDTH);
 font_browser->callback(cbDXC_FontBrowser);
 font_browser->show();}
-            xywh {262 273 86 25}
+            xywh {213 293 86 25}
             code0 {\#include "font_browser.h"}
           }
           Fl_Button btnDXCdefault_colors_font {
@@ -753,14 +779,14 @@ DXC_display->textcolor(progStatus.DXC_textcolor);
 DXC_display->textfont(progStatus.DXC_textfont);
 
 DXC_display->redraw();}
-            xywh {354 273 86 25}
+            xywh {305 293 86 25}
           }
           Fl_Button btn_DXC_even_lines {
             label {Even Lines}
             callback {progStatus.DXC_even_color = fl_show_colormap((Fl_Color)progStatus.DXC_even_color);
 o->color(progStatus.DXC_even_color);
 o->redraw();}
-            xywh {262 304 86 25} color 55
+            xywh {213 324 86 25} color 55
             code0 {o->color(progStatus.DXC_even_color);}
             code1 {\#include <FL/fl_show_colormap.H>}
           }
@@ -769,12 +795,12 @@ o->redraw();}
             callback {progStatus.DXC_odd_color = fl_show_colormap((Fl_Color)progStatus.DXC_odd_color);
 o->color(progStatus.DXC_odd_color);
 o->redraw();}
-            xywh {354 304 86 25} color 246
+            xywh {305 324 86 25} color 246
             code0 {o->color(progStatus.DXC_odd_color);}
           }
           Fl_Input StreamText {
             label {Stream Text}
-            xywh {73 343 184 25} align 5
+            xywh {24 363 184 25} align 5
             code0 {o->value("DX de W1HKJ...");}
             code1 {o->color(fl_rgb_color(progStatus.DX_Color_R, progStatus.DX_Color_G, progStatus.DX_Color_B));}
             code2 {o->textfont(progStatus.DXfontnbr); o->textsize(progStatus.DXfontsize); o->textcolor(progStatus.DXfontcolor);}
@@ -818,7 +844,7 @@ ed_telnet_cmds->color(fl_rgb_color(r,g,b));
 ed_telnet_cmds->redraw();
 
 dxcluster_hosts_load();}
-            xywh {262 343 86 25}
+            xywh {213 363 86 25}
           }
           Fl_Button btnDXfont {
             label Font
@@ -828,7 +854,7 @@ dxcluster_hosts_load();}
     font_browser->fontFilter(Font_Browser::FIXED_WIDTH);
     font_browser->callback(cbDX_FontBrowser);
 font_browser->show();}
-            xywh {354 343 86 25}
+            xywh {305 363 86 25}
           }
           Fl_Button btnDXalt_color {
             label {Alt Color}
@@ -839,7 +865,7 @@ o->redraw_label();
 
 brws_tcpip_stream->setFontColor(progStatus.DXalt_color, FTextBase::XMIT);
 brws_tcpip_stream->redraw();}
-            tooltip {Color for outgoing telnet text} xywh {446 342 86 25}
+            tooltip {Color for outgoing telnet text} xywh {397 362 86 25}
             code0 {o->labelcolor(progStatus.DXalt_color);}
           }
           Fl_Button btnDXdefault_colors_font {
@@ -893,52 +919,70 @@ StreamText->redraw();
 dxcluster_hosts_load();
 
 font_browser->hide();}
-            xywh {540 342 86 25}
+            xywh {491 362 86 25}
           }
-        }
-        Fl_Group gp_resize_uc {open
-          xywh {7 388 664 15}
-        } {}
-        Fl_Check_Button btn_tooltips {
-          label {Enable Tooltips}
-          callback {progStatus.tooltips=o->value();
-Fl_Tooltip::enable(progStatus.tooltips);}
-          xywh {487 123 78 15} down_box DOWN_BOX value 1
-          code0 {\#include <FL/Fl_Tooltip.H>}
-          code1 {o->value(progStatus.tooltips);}
         }
         Fl_Group {} {
           label {Keepalive signal} open
-          xywh {275 120 170 115} box ENGRAVED_BOX align 17
+          xywh {325 106 175 160} box ENGRAVED_BOX align 17
         } {
+          Fl_Round_Button btn_zero_keepalive {
+            label never
+            callback {progStatus.keepalive = 0;
+o->value(1);
+btn_one_keepalive->value(0);
+btn_five_keepalive->value(0);
+btn_ten_keepalive->value(0);}
+            tooltip {disable keep alive signal} xywh {340 138 151 26} down_box ROUND_DOWN_BOX
+            code0 {o->value(progStatus.keepalive == 0);}
+          }
           Fl_Round_Button btn_one_keepalive {
             label {every minute}
             callback {progStatus.keepalive = 1;
 o->value(1);
+btn_zero_keepalive->value(0);
 btn_five_keepalive->value(0);
 btn_ten_keepalive->value(0);}
-            xywh {285 152 151 20} down_box ROUND_DOWN_BOX
+            tooltip {send keepalive signal every minute} xywh {340 166 151 26} down_box ROUND_DOWN_BOX
             code0 {o->value(progStatus.keepalive == 1);}
           }
           Fl_Round_Button btn_five_keepalive {
             label {every 5 minutes}
             callback {progStatus.keepalive = 5;
 o->value(1);
+btn_zero_keepalive->value(0);
 btn_one_keepalive->value(0);
 btn_ten_keepalive->value(0);}
-            xywh {285 175 151 20} down_box ROUND_DOWN_BOX
+            tooltip {send keepalive signal every 5 minutes} xywh {340 194 151 26} down_box ROUND_DOWN_BOX
             code0 {o->value(progStatus.keepalive == 5);}
           }
           Fl_Round_Button btn_ten_keepalive {
             label {every 10 minutes}
             callback {progStatus.keepalive = 10;
 o->value(1);
+btn_zero_keepalive->value(0);
 btn_one_keepalive->value(0);
 btn_five_keepalive->value(0);}
-            xywh {285 198 151 20} down_box ROUND_DOWN_BOX
+            tooltip {send keepalive signal every 10 minutes} xywh {340 224 151 25} down_box ROUND_DOWN_BOX
             code0 {o->value(progStatus.keepalive == 10);}
           }
         }
+        Fl_Group grp_misc {
+          label Miscellaneous
+          xywh {505 106 170 160} box ENGRAVED_BOX align 17
+        } {
+          Fl_Check_Button btn_tooltips {
+            label {Enable Tooltips}
+            callback {progStatus.tooltips=o->value();
+Fl_Tooltip::enable(progStatus.tooltips);}
+            xywh {525 143 78 15} down_box DOWN_BOX value 1
+            code0 {\#include <FL/Fl_Tooltip.H>}
+            code1 {o->value(progStatus.tooltips);}
+          }
+        }
+        Fl_Group grp_resize_uc {open
+          xywh {5 405 670 7} resizable
+        } {}
       }
       Fl_Group tabDXclusterHelp {
         label {Cluster Help}

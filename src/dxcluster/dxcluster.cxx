@@ -53,8 +53,6 @@
 #include "dx_dialog.h"
 #include "dx_cluster.h"
 
-#define DXC_DEBUG 1
-
 using namespace std;
 
 void abort_connection();
@@ -65,16 +63,15 @@ int connection_timeout = 0;
 static char zdbuf[9] = "20120602";
 static char ztbuf[11] = "12:30:00 Z";
 
-#ifdef DXC_DEBUG
 static void write_dxc_debug(char c, string txt)
 {
+	if (!dx_stream) return;
 	string pname = HOME_DIR;
-	pname.append("dx_node.txt");
+	pname.append("dx_stream.txt");
 	FILE *dxcdebug = fl_fopen(pname.c_str(), "a");
 	fprintf(dxcdebug, "%s [%c]:%s", ztbuf, c, txt.c_str());
 	fclose(dxcdebug);
 }
-#endif
 
 // =====================================================================
 //
@@ -226,20 +223,20 @@ static char odd[50];
 //======================================================================
 // fldigi modem names
 //======================================================================
-enum { CW, PSK, RTTY, CTSTIA, SSB };
+enum { CW, PSK, BPSK31, BPSK63, BPSK63F, BPSK125, RTTY, CTSTIA, SSB };
 
-struct MODEMS { int NBR; std::string name; };
+struct MODEMS { int mode; std::string name; std::string srch;};
 
 MODEMS modems[] = {
-{CW, "CW"},
-{PSK, "PSK"},
-{PSK, "BPSK31"},
-{PSK, "BPSK63"},
-{PSK, "BPSK63F"},
-{PSK, "BPSK125"},
-{RTTY, "RTTY"},
-{CTSTIA, "CTSTIA"},
-{SSB, "SSB"} };
+{CW, "CW", "CW"},
+{PSK, "BPSK", "PSK"},
+{BPSK31, "BPSK31", "PSK31"},
+{BPSK63, "BPSK63", "PSK63"},
+{BPSK63F, "BPSK63F", "PSK63F"},
+{BPSK125, "BPSK125", "PSK125"},
+{RTTY, "RTTY", "RTTY"},
+{CTSTIA, "CTSTIA", "CTSTIA"},
+{SSB, "SSB", "SSB"} };
 
 //======================================================================
 // Socket DXcluster i/o used on all platforms
@@ -395,9 +392,7 @@ void show_tx_stream(string buff)
 	brws_que.push(buff);
 	Fl::awake(update_brws_tcpip_stream);
 
-#ifdef DXC_DEBUG
 	write_dxc_debug('W', buff);
-#endif
 }
 
 void show_rx_stream(string buff)
@@ -416,9 +411,7 @@ void show_rx_stream(string buff)
 	brws_que.push(buff);
 	Fl::awake(update_brws_tcpip_stream);
 
-#ifdef DXC_DEBUG
 	write_dxc_debug('R', buff);
-#endif
 }
 
 void show_error(string buff)
@@ -431,40 +424,79 @@ void show_error(string buff)
 	brws_que.push(buff);
 	Fl::awake(update_brws_tcpip_stream);
 
-#ifdef DXC_DEBUG
 	write_dxc_debug('E', buff);
-#endif
+}
+
+//---------------------------------------------------------------------------------
+//         1         2         3         4         5         6         7         8
+//1234567890123456789012345678901234567890123456789012345678901234567890123456789012345
+//|          ||        | |            ||                                | |           |
+//KB8O        10114240.0 D66D          up 10 59 Ohio                   NE 2059Z EN81 AL
+//call    15/100
+//freq    15/100
+//spot    15/100
+//comment 40/100
+//time     6/100
+//rem      9/100
+//       100/100
+static int widths[] = {13, 14, 13, 43, 7, 0};
+
+void dxc_column_widths()
+{
+	widths[0] = 13 * brws_dx_cluster->w() / 100;
+	widths[1] = 14 * brws_dx_cluster->w() / 100;
+	widths[2] = 13 * brws_dx_cluster->w() / 100;
+	widths[3] = 43 * brws_dx_cluster->w() / 100;
+	widths[4] =  7 * brws_dx_cluster->w() / 100;
+
+	brws_dx_cluster->column_char('^');
+	brws_dx_cluster->column_widths(widths);
+	reports_header->column_char('^');
+	reports_header->column_widths(widths);
+
+	fl_font(progStatus.DXC_textfont, progStatus.DXC_textsize);
+	int hh = fl_height() + 4;
+	int h = reports_header->h() + brws_dx_cluster->h();
+	reports_header->resize(
+		reports_header->x(), reports_header->y(),
+		reports_header->w(), hh);
+	brws_dx_cluster->resize(
+		brws_dx_cluster->x(), brws_dx_cluster->y(),
+		brws_dx_cluster->w(), h - hh);
+	reports_header->redraw();
+	brws_dx_cluster->redraw();
 }
 
 void dxc_colors_fonts()
 {
-	char hdr[100];
+	char hdr[200];
 
-	snprintf(hdr, sizeof(hdr), "\
-@F%d@S%d@.\
-Spotter  |  Freq  | Dx Station  |             Notes            | UTC | Rem'",
-			progStatus.DXC_textfont,
-			progStatus.DXC_textsize);
-	reports_header->clear();
-	reports_header->add(hdr);
+	dxc_column_widths();
 
-	snprintf(odd, sizeof(odd), "@B%u@C%u@F%d@S%d@.",
+	snprintf(odd, sizeof(odd),
+			"@B%u@C%u@F%d@S%d",
 			progStatus.DXC_odd_color,
 			FL_BLACK,
 			progStatus.DXC_textfont,
 			progStatus.DXC_textsize);
 
-	snprintf(even, sizeof(even), "@B%u@C%u@F%d@S%d@.",
+	snprintf(even, sizeof(even),
+		"@B%u@C%u@F%d@S%d",
 		progStatus.DXC_even_color,
 		FL_BLACK,
 		progStatus.DXC_textfont,
 		progStatus.DXC_textsize);
+
+	snprintf(hdr, sizeof(hdr),
+		"%s@cSpotter^%s@cFreq^%s@cDx Call^%s@cComments^%s@cUTC^%s@cQRA",
+		even, odd, even, odd, even, odd);
+	reports_header->clear();
+	reports_header->add(hdr);
+
 }
 
 void dxc_lines()
 {
-	dxc_colors_fonts();
-
 	guard_lock dxcc_lock(&dxc_line_mutex);
 	int n = brws_dx_cluster->size();
 
@@ -479,20 +511,38 @@ void dxc_lines()
 			dxc_line = brws_dx_cluster->text(i+1);
 		else
 			dxc_line = brws_dx_cluster->text(n - i);
-		p = dxc_line.find(".");
-		if (p != string::npos) dxc_line.erase(0,p+1);
+
+		while ((p = dxc_line.find(even)) != string::npos)
+			dxc_line.erase(p, strlen(even));
+
+		while ((p = dxc_line.find(odd)) != string::npos)
+			dxc_line.erase(p, strlen(odd));
+
 		lines.push(dxc_line);
 	}
+
+	dxc_colors_fonts();
 
 	brws_dx_cluster->clear();
 
 	for (int i = 0; i < n; i++) {
-		if (i % 2)
-			dxc_line.assign(even);
-		else
-		dxc_line.assign(odd);
+		dxc_line = lines.front();
+		if (i % 2) {
+			dxc_line.insert(0, even);
+			p = 0;
+			while ((p = dxc_line.find("^", p)) != string::npos) {
+				dxc_line.insert(p+1, even);
+				p += strlen(even);
+			}
+		} else {
+			dxc_line.insert(0, odd);
+			p = 0;
+			while ((p = dxc_line.find("^", p)) != string::npos) {
+				dxc_line.insert(p+1, odd);
+				p += strlen(odd);
+			}
+		}
 
-		dxc_line.append(lines.front());
 		lines.pop();
 
 		if (progStatus.dxc_topline)
@@ -511,9 +561,9 @@ void dxc_lines()
 
 /*===============================================================================
   raw dx spot line
-          1         2         3         4         5         6         7        
+          1         2         3         4         5         6         7
 012345678901234567890123456789012345678901234567890123456789012345678901234567890
-      <   1    |    2  >  <   3        <4         5         6        < 
+      <   1    |    2  >  <   3        <4         5         6        <
 DX de NK9O:      14074.0  TI4DJ        FT8 EN63>EK70                 0021Z WI
 DX de VE9CB:      7016.9  EA8AF                                      0021Z
 DX de K6KQV:     14074.0  XO1X         Many Tnx.                     0018Z CA
@@ -537,10 +587,22 @@ void update_brws_dx_cluster(void *)
 		dxc_line = dxclines.front();
 		dxclines.pop();
 
-		if (brws_dx_cluster->size() % 2)
+		size_t p = string::npos;
+		if (brws_dx_cluster->size() % 2) {
 			dxc_line.insert(0, even);
-		else
+			p = 0;
+			while ((p = dxc_line.find("^", p)) != string::npos) {
+				dxc_line.insert(p+1, even);
+				p += strlen(even);
+			}
+		} else {
 			dxc_line.insert(0, odd);
+			p = 0;
+			while ((p = dxc_line.find("^", p)) != string::npos) {
+				dxc_line.insert(p+1, odd);
+				p += strlen(odd);
+			}
+		}
 
 		if (progStatus.dxc_topline) {
 			bool visible = brws_dx_cluster->displayed(1);
@@ -560,21 +622,152 @@ void parse_dxline(string dxbuffer)
 
 	guard_lock dxcc_lock(&dxc_line_mutex);
 
-//std::cout << hexvals(dxbuffer) << std::endl;
-
-// insure that time field always starts at character position 70
-	if (dxbuffer.length() > 68) {
-		if (isdigit(dxbuffer[69]) && (dxbuffer[68] == ' '))
-			dxbuffer.insert(69, 1, ' ');
-	}
+	dxinfo dxc;
 
 	dxbuffer.erase(0, strlen("DX de "));
 	size_t p = dxbuffer.find(":");
-	if (p != string::npos) dxbuffer.replace(p, 1, " ");
+	if (p == string::npos || p > 16) 
+		p = dxbuffer.find(" ");
 
-	dxclines.push(dxbuffer);
+	dxc.spotter = dxbuffer.substr(0,p);
+	dxbuffer.erase(0,p+1);
+	while(dxbuffer[0] == ' ') dxbuffer.erase(0,1);
+
+	p = dxbuffer.find(" ");
+	dxc.freq = dxbuffer.substr(0,p);
+	dxbuffer.erase(0,p+1);
+	while (dxbuffer[0] == ' ') dxbuffer.erase(0,1);
+
+	p = dxbuffer.find(" ");
+	dxc.call = dxbuffer.substr(0,p);
+	dxbuffer.erase(0, p+1);
+
+	string tzulu;
+	p = 0;
+	while (p < dxbuffer.length() - 4) {
+		if (isdigit(dxbuffer[p]) &&
+			isdigit(dxbuffer[p+1]) &&
+			isdigit(dxbuffer[p+2]) &&
+			isdigit(dxbuffer[p+3]) &&
+			(dxbuffer[p+4] == 'Z' || dxbuffer[4] == 'z')) {
+			dxc.time = dxbuffer.substr(p, 5);
+			if (dxbuffer.length() > p+5);
+			dxc.spotter_US_state = dxbuffer.substr(p+5);
+			dxbuffer.erase(p-1);
+		}
+		p++;
+	}
+	dxc.comment = dxbuffer;
+
+	while (dxc.comment[0] == ' ') dxc.comment.erase(0,1);
+	while (dxc.comment[dxc.comment.length()-1] == ' ')
+		dxc.comment.erase(dxc.comment.length() - 1);
+	size_t n = dxc.comment.length();
+	if (n == 2) dxc.comment.insert(0,34, ' ');
+	else if (n > 3) {
+		if ((dxc.comment[n-3] == ' ') && (isalpha(dxc.comment[n-2])) &&
+			(isalpha(dxc.comment[n-1]))) {
+			dxc.comment.insert(n-3, 36 - n, ' ');
+		}
+	}
+
+	string spot;
+	spot.assign("@.").append(dxc.spotter);
+	spot.append("^@r@.").append(dxc.freq);
+	spot.append("^@.").append(dxc.call);
+	spot.append("^@.").append(dxc.comment);
+	spot.append("^@r@.").append(dxc.time);
+	spot.append("^@.").append(dxc.spotter_US_state);
+
+	dxclines.push(spot);
 
 	Fl::awake(update_brws_dx_cluster);
+}
+
+void parse_cc11_line(string buffer)
+{
+
+//If you do a set/ve7cc command on connection startup, you will get this
+//out for spots (everything else is "normal"):
+
+//CC11^7083.0^OP17A^26-Aug-2017^0859Z^Sp�cial call com 14-18^ON3LX^134^134^F5LEN-7^27^14^27^14^^^Belgium-ON^Belgium-ON^^JN29
+//CC11^14260.0^IQ2XZ/P^26-Aug-2017^0859Z^AWARD PAOLO NESPOLI 1PT^IZ1VZG^85^85^GB7UJS^28^15^28^15^^^Lombardia-I^Liguria-Piemonte-I^^JN34
+
+// CC11
+// normalised freq (in khz, 1 dec.pl.)
+// call
+// date
+// time
+// comment
+// spotter
+// call country code
+// spotter country code
+// originating node
+// call itu zone
+// call cq zone
+// spotter itu zone
+// spotter cq zone
+// call US state
+// spotter US state
+// call country in text
+// spotted country in text
+// call grid square
+// spotter grid square
+
+	dxinfo dxcc;
+
+	size_t p = 0;
+	p = buffer.find("^");
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.freq = buffer.substr(0,p);
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.call = buffer.substr(0,p);
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.date = buffer.substr(0,p);
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.time = buffer.substr(0,p);
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.comment = buffer.substr(0,p);
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.spotter = buffer.substr(0,p);
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.call_country_code = buffer.substr(0,p);
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.spotter_country_code = buffer.substr(0,p);
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.originating_node = buffer.substr(0,p);
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.call_itu_zone = buffer.substr(0,p);
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.call_cq_zone = buffer.substr(0,p);
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.spotter_itu_zone = buffer.substr(0,p);
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.spotter_cq_zone = buffer.substr(0,p);
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.call_US_state = buffer.substr(0,p);
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.spotter_US_state = buffer.substr(0,p);
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.call_country_text = buffer.substr(0,p);
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.spotter_country_text = buffer.substr(0,p);
+	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.call_grid_square = buffer.substr(0,p);
+	buffer.erase(0, p+1); dxcc.spotter_grid_square = buffer;
+
+	string spot;
+	spot.assign("@.").append(dxcc.spotter);
+	spot.append("^@r@.").append(dxcc.freq);
+	spot.append("^@.").append(dxcc.call);
+
+	if (dxcc.call_US_state.length() < 2) {
+		if (dxcc.comment.length() > 36) dxcc.comment.erase(36);
+		if (dxcc.comment.length() < 36) dxcc.comment.append(36 - dxcc.comment.length(), ' ');
+	} else {
+		if (dxcc.comment.length() > 33) dxcc.comment.erase(33);
+		if (dxcc.comment.length() < 33) dxcc.comment.append(33 - dxcc.comment.length(), ' ');
+		dxcc.comment.append(" ").append(dxcc.call_US_state);
+	}
+
+	spot.append("^@.").append(dxcc.comment);
+	spot.append("^@r@.").append(trim(dxcc.time));
+
+	if (!trim(dxcc.spotter_US_state).empty()) {
+		spot.append("^@.").append(trim(dxcc.spotter_US_state));
+		if (!trim(dxcc.call_grid_square).empty());
+			spot.append(" ").append(trim(dxcc.call_grid_square));
+	} else {
+		if (!trim(dxcc.call_grid_square).empty());
+			spot.append("^@.").append(trim(dxcc.call_grid_square));
+	}
+
+	dxclines.push(spot);
+
+	Fl::awake(update_brws_dx_cluster);
+
 }
 
 std::queue<string> help_que;
@@ -598,9 +791,7 @@ void show_help_line(void *) //string buff)
 	help_que.push(helpbuff.append("\n"));
 	Fl::awake(update_brws_dxc_help);
 
-#ifdef DXC_DEBUG
 	write_dxc_debug('H', helpbuff);
-#endif
 }
 
 enum server_type {NIL, DX_SPIDER, AR_CLUSTER, CC_CLUSTER};
@@ -638,6 +829,10 @@ int wait_for_keepalive = -1;
 
 void keepalive()
 {
+// disabled if 'never'
+	if (progStatus.keepalive == 0)
+		return;
+
 // send \b every NN minutes, NN = 0 (never), 1, 5 or 10
 	bool b_keepalive = false;
 //	if (!progStatus.keepalive) return; // no keep alive
@@ -679,30 +874,6 @@ void keepalive()
 	}
 }
 
-void register_dxspider()
-{
-	string login;
-
-	login.assign("set/page 0\r\n");
-	write_socket(login);
-	show_tx_stream(login);
-
-	login.assign("set/name ").append(progStatus.myName);
-	login.append("\r\n");
-	write_socket(login);
-	show_tx_stream(login);
-
-	login.assign("set/qth ").append(progStatus.myQth);
-	login.append("\r\n");
-	write_socket(login);
-	show_tx_stream(login);
-
-	login.assign("set/qra ").append(progStatus.myLocator);
-	login.append("\r\n");
-	write_socket(login);
-	show_tx_stream(login);
-}
-
 void login_to_dxspider()
 {
 	if (!DXcluster_socket) return;
@@ -712,9 +883,6 @@ void login_to_dxspider()
 		write_socket(login);
 		show_tx_stream(login);
 
-		if (progStatus.dxcc_password.empty())
-			register_dxspider();
-
 		logged_in = true;
 		connection_timeout = 0;
 		cluster_login = NIL;
@@ -724,7 +892,6 @@ void login_to_dxspider()
 		str_loggedin.append(progStatus.dxcc_host_port);
 
 		LOG_INFO("%s", str_loggedin.c_str());
-		show_tx_stream(str_loggedin);
 
 	} catch (const SocketException& e) {
 		LOG_ERROR("%s", e.what() );
@@ -734,9 +901,9 @@ void login_to_dxspider()
 
 void login_to_arcluster()
 {
-	string login = progStatus.dxcc_login;
-	login.append("\r\n");
 	try {
+		string login = progStatus.dxcc_login;
+		login.append("\r\n");
 		write_socket(login);
 		show_tx_stream(login);
 
@@ -749,7 +916,6 @@ void login_to_arcluster()
 		str_loggedin.append(progStatus.dxcc_host_port);
 
 		LOG_INFO("%s", str_loggedin.c_str());
-		show_tx_stream(str_loggedin);
 
 	} catch (const SocketException& e) {
 		LOG_ERROR("%s", e.what() );
@@ -814,39 +980,55 @@ Connection closed by foreign host.
 
 */
 
-void register_cccluster()
+void send_name()
 {
-	string login;
+	if (!DXcluster_socket || logged_in == false) return;
 
-	login.assign("set/name ").append(progStatus.myName);
-	login.append("\r\n");
-	write_socket(login);
-	show_tx_stream(login);
+	try {
+		guard_lock dxc_lock(&DXcluster_mutex);
+		string login;
+		login.assign("set/name ").append(progStatus.myName);
+		login.append("\r\n");
+		write_socket(login);
+		show_tx_stream(login);
+	} catch (const SocketException& e) {
+		LOG_ERROR("%s", e.what() );
+		show_error(e.what());
+	}
+}
 
-	login.assign("set/qth ").append(progStatus.myQth);
-	login.append("\r\n");
-	write_socket(login);
-	show_tx_stream(login);
+void send_qth()
+{
+	if (!DXcluster_socket || logged_in == false) return;
 
-	login.assign("set/qra ").append(progStatus.myLocator);
-	login.append("\r\n");
-	write_socket(login);
-	show_tx_stream(login);
+	try {
+		guard_lock dxc_lock(&DXcluster_mutex);
+		string login;
+		login.assign("set/qth ").append(progStatus.myQth);
+		login.append("\r\n");
+		write_socket(login);
+		show_tx_stream(login);
+	} catch (const SocketException& e) {
+		LOG_ERROR("%s", e.what() );
+		show_error(e.what());
+	}
+}
 
-	login.assign("set/noskimmer");
-	login.append("\r\n");
-	write_socket(login);
-	show_tx_stream(login);
+void send_qra()
+{
+	if (!DXcluster_socket || logged_in == false) return;
 
-	login.assign("set/noown");
-	login.append("\r\n");
-	write_socket(login);
-	show_tx_stream(login);
-
-	login.assign("set/nobeacon");
-	login.append("\r\n");
-	write_socket(login);
-	show_tx_stream(login);
+	try {
+		guard_lock dxc_lock(&DXcluster_mutex);
+		string login;
+		login.assign("set/qra ").append(progStatus.myLocator);
+		login.append("\r\n");
+		write_socket(login);
+		show_tx_stream(login);
+	} catch (const SocketException& e) {
+		LOG_ERROR("%s", e.what() );
+		show_error(e.what());
+	}
 }
 
 void login_to_cccluster()
@@ -858,9 +1040,6 @@ void login_to_cccluster()
 		login.append("\r\n");
 		write_socket(login);
 		show_tx_stream(login);
-
-		if (progStatus.dxcc_password.empty())
-			register_cccluster();
 
 		logged_in = true;
 		connection_timeout = 0;
@@ -881,9 +1060,8 @@ void login_to_cccluster()
 
 void send_password()
 {
-	if (!DXcluster_socket ||
-		logged_in == false ||
-		inp_dxcc_password->value()[0] == 0) return;
+	if (logged_in == false || inp_dxcc_password->value()[0] == 0)
+		return;
 
 	try {
 		string password = inp_dxcc_password->value();
@@ -891,19 +1069,12 @@ void send_password()
 		write_socket(password);
 		show_tx_stream(password);
 
-		switch (cluster_login) {
-			case AR_CLUSTER: break;
-			case CC_CLUSTER: register_cccluster(); break;
-			case DX_SPIDER:  register_dxspider(); break;
-		}
-
 	} catch (const SocketException& e) {
 		LOG_ERROR("%s", e.what() );
 		show_error(e.what());
 	}
 
 }
-
 
 static bool help_lines = false;
 
@@ -974,6 +1145,11 @@ void parse_DXcluster_stream(string input_buffer)
 			continue;
 		}
 
+		if (ucasebuffer.find("CC11^") != string::npos) {
+			parse_cc11_line(buffer);
+			continue;
+		}
+
 		if (ucasebuffer.find("HELP") != string::npos) {
 			help_lines = true;
 		}
@@ -996,7 +1172,7 @@ void parse_DXcluster_stream(string input_buffer)
 		if (cluster_login == DX_SPIDER && ucasebuffer.find("LOGIN:") != string::npos)
 			login_to_dxspider();
 
-		if (cluster_login == DX_SPIDER && ucasebuffer.find("PASSWORD:") != string::npos)
+		if (ucasebuffer.find("PASSWORD:") != string::npos)
 			send_password();
 
 	}
@@ -1038,7 +1214,8 @@ void DXcluster_recv_data()
 		}
 	} catch (const SocketException& e) {
 		LOG_ERROR("Error %d, %s", e.error(), e.what());
-		abort_connection();
+		Fl::awake(restart_connection);
+//		abort_connection();
 	}
 }
 
@@ -1160,12 +1337,15 @@ void DXcluster_select()
 	int sel = brws_dx_cluster->value();
 	if (sel == 0) return;
 
-//--------------------------------------------------------------------------------
-//          1         2         3         4         5         6         7
-//01234567890123456789012345678901234567890123456789012345678901234567890123456789
-//          1^        ^         3  ^      4         5         6   ^
-//KB8O       14240.0  D66D         up 10 59 Ohio                  2059Z EN81<cr><lf>
+//@B246@C56@F4@S15@.SQ6JFR^			# spotter
+//@B246@C56@F4@S15@r@.14071.0^		# frequency
+//@B246@C56@F4@S15@.LZ100SK^		# dx call
+//@B246@C56@F4@S15@.Gosho 73^		# comments
+//@B246@C56@F4@S15@r@.0920Z^		# time
+//@B246@C56@F4@S15@.				# qra
+
 	string dxcline = brws_dx_cluster->text(sel);
+
 	size_t p = dxcline.find("@.");
 	if (p == string::npos)
 		return;
@@ -1174,33 +1354,37 @@ void DXcluster_select()
 	dxcline = dxcline.substr(p + 2);
 
 // remove reporting stations call
-	p = dxcline.find(" ");
-	dxcline.erase(0, p+1);
+	p = dxcline.find("@.");
+	dxcline.erase(0, p + 2);
 
 // find reported frequency
-	while (dxcline[0] == ' ') dxcline.erase(0,1);
-	p = dxcline.find(" ");
+	p = dxcline.find("^");
 	string sfreq = dxcline.substr(0, p);
-	dxcline.erase(0, p+1);
+//	dxcline.erase(0, p + 1);
 
 // find dx call
-	while (dxcline[0] == ' ') dxcline.erase(0,1);
-	p = dxcline.find(" ");
+	p = dxcline.find("@.");
+	dxcline.erase(0, p + 2);
+	p = dxcline.find("^");
 	string dxcall = trim(dxcline.substr(0, p));
-	dxcline.erase(0, p+1);
+//	dxcline.erase(0, p + 1);
 
 // treat remainder as remarks
 // search for a mode name in the remarks
 
+	p = dxcline.find("@.");
+	dxcline.erase(0, p + 2);
+	p = dxcline.find("^");
+	dxcline.erase(p);
+
 	dxcline = ucasestr(dxcline);
 	int md = CW;
 	for (size_t i = 0; i < sizeof(modems) / sizeof(*modems); i++) {
-		if (dxcline.find(modems[md].name) != string::npos) {
-			md = modems[i].NBR;
-			break;
+		if (dxcline.find(modems[i].srch) != string::npos) {
+			md = modems[i].mode;
 		}
 	}
-
+	if (md == PSK) md = BPSK31;
 
 	long freq = (long)(atof(sfreq.c_str()) * 1000.0 + 0.5);
 // does remark section have a [nn] block?
@@ -1215,7 +1399,7 @@ void DXcluster_select()
 
 	rf_af(freq, af, md);
 
-	send_xml_dx_sta(dxcall, freq);
+	send_xml_dx_sta(dxcall, freq, modems[md].name);
 
 }
 
@@ -1339,7 +1523,7 @@ void set_socket_options()
 	}
 	LOG_INFO("SO_KEEPALIVE is %s", (optval ? "ON" : "OFF"));
 
-	optval = 1; 
+	optval = 1;
 	if (setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, (char *)&optval, optlen) < 0) {
 		LOG_ERROR("setsockopt(...) error");
 		exit(1);
@@ -1362,7 +1546,7 @@ void set_socket_options()
 	}
 	LOG_INFO("SO_KEEPALIVE is %s", (optval ? "ON" : "OFF"));
 
-	optval = 1; 
+	optval = 1;
 	if (setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, &optval, optlen) < 0) {
 		LOG_ERROR("setsockopt(...) error");
 		exit(1);
@@ -1412,7 +1596,7 @@ void DXcluster_doconnect()
 				LOG_INFO( "%s", "Connected to socket");
 				connect_changed = false;
 				connection_timeout = 150;// 15 seconds timeout on new connection
-				show_rx_stream("Waiting for login prompt");
+				show_rx_stream("Connected to socket, waiting for login prompt");
 				return;
 			} else if ( (result == EWOULDBLOCK) || (result == EINPROGRESS) )
 				DXcluster_state = CONNECTING;

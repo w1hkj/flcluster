@@ -32,7 +32,7 @@ extern void close_fldigi_xmlrpc();
 extern void close_client();
 extern void open_client();
 
-extern void send_xml_dx_sta(std::string, long); // keep
+extern void send_xml_dx_sta(std::string, long, std::string);
 extern int  get_fldigi_freq();
 
 extern std::string get_fldigi_call();
