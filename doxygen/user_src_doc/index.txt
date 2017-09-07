@@ -38,7 +38,17 @@ fldigi controls.  It can query fldigi for the same items when generating a spot
 report.
 
 \section s_logon Logging on to remote host
-Before any logon you should configure flcluster with your basic personal information.
+Before any logon you should configure flcluster with your basic personal information.  Check
+the "Enable Tooltlips" if you want a small tooltip popup window to display when the cursor hovers
+over an flcluster control.
+<br>
+
+flcluster needs to send occassionally send a backspace character (keepalive) to the cluster server.  The
+server echos backspace.  If the echo is not received within a 30 second window then the server
+connection is assumed to be down.  flcluster will attempt to reconnect if this occurs.  Receipt of
+a broadcast message such as a dx spot report will also serve to satisfy the echo receipt.  You
+can set the keepalive interval to 1, 5, or 10 minutes.  5 should probably suffice for most servers and
+internet paths.
 <br>
 <center>
 \image html user-info.png ""
@@ -51,14 +61,9 @@ Before any logon you should configure flcluster with your basic personal informa
 </center>
 Enter the DX HOST hostname/IP, the Port and your Login call.  Then check
 the "Connect" control.  The "Connected" label will be visible only after
-the remote host connection has been been made.  The above dialog shows the
-4 hosts that I routinely use.
-<ul>
-<li>dx.n8noe.us, an AR Cluster server</li>
-<li>dxc.wb3ffv.us, a DX Spider server</li>
-<li>k4zr.no-ip.org, a DX Spider server</li>
-<li>w3nr.ddns.net, a DX Spider server</li>
-</ul>
+the remote host connection has been been made.
+<br>
+
 Immediately after checking the "Connect" control the dxcluster dialog should
 change to the "TelNet stream" tab.  This tab displays the raw telnet data
 stream, shown here for the Ed's server, w3nr.ddns.net.  Ed runs his DX Spider
@@ -84,8 +89,6 @@ following refers to the Cluster Config tab.
 <li>Highlight an entry and press the "Select" button to transfer the elements
 to the connect controls.</li>
 <li>Highlight an entry and press the "Delete" button to delete an entry.</li>
-<li>Use the menu item "Configure / Save Config" to save the modified list.
-It will be restored the next time fldigi is executed.</li>
 </ul>
 Press the "Servers" button if you are unfamiliar with the telnet address and 
 port number of a convenient dxcluster server.  fldigi will open up a local
@@ -94,6 +97,23 @@ html document with a list of recently verified servers:
 \image html dxc_servers.png ""
 \image latex dxc_servers.png "" width=5.0in
 </center>
+<br>
+
+With the exception of the cluster server setup commands (next section), flcluster
+will automatically save changes that you make in it's configuration.  flcluster
+saves all setup and other related files to it's working folder:
+<br>
+
+<center>
+| Operating System  | Folder/Directory                                          |
+| :---------------: | :-------------------------------------------------------- |
+| Windows           | C:\\Documents and Settings\\\<username\>\\flcluster.files |
+| Vista             | C:\\Users\\\<username\>\\flcluster.files                  |
+| Linux             | /home/\<username\>/.flcluster                             |
+| Apple OS X        | /Users/User_Login_Name/.flcluster                         |
+</center>
+<br>
+
 \subsection s_dxc_config_init_cmds Initial Host Commands
 Most cluster servers will save your setup commands from a previous telnet
 session.  You can also store those commands in the text editing control,
@@ -101,7 +121,7 @@ session.  You can also store those commands in the text editing control,
 <br>
 
 You can save and reload any number of command sequences.  Each is saved in a plain text
-file in the fldigi files subfolder "Scripts".  The default extension for the dxcluster
+file in the flcluster files subfolder "Scripts".  The default extension for the dxcluster
 scripts is "dxc".  Be sure you add the extension to your saved files.
 It will not be added if you do not with the result that file may not be
 visible when you try to load it.
@@ -128,9 +148,10 @@ Press the corresponding help button:
 </center>
 
 \subsection s_auto_spotting  Spot when logged
-Enable the "Spot when logged" check box if you want to create the spot report
+Enable the "Spot when logged" in fldigi if you want to create the spot report
 whenever you log a contact from the fldigi main dialog.  You will still have
-to review the spot report and submit it with the Submit button.
+to review the spot report and submit it with the Submit button.  You must be
+connected to fldigi for this to work.
 
 \subsection s_auto_connect  Auto Connect to Host
 Enable the "Auto Connect" if you want to connect to the host when starting
@@ -163,9 +184,9 @@ Enter the command, for example: "SHow/FILTER", or "SH/FILTER".  Then press the
 can view the results on the "TelNet stream" tab.
 <br>
 
-During a logon to the remote host fldigi will send some default commands depending
+During a logon to the remote host flcluster will send some default commands depending
 on the host type.  If the remote host is either an CC-Cluster or DX Spider host then
-fldigi will send this sequence:
+flcluster will send this sequence:
 \verbatim
      set/page 0
      set/name [user name]
@@ -181,7 +202,7 @@ Cmd: control.  You can modify the command string before pressing the Submit
 button.
 \subsection s_dxc_spotting Submitting a spot
 You generate a spot report using the Spot button on the TelNet stream tab.
-Fldigi will generate a spot report that tries to provide the cluster with
+Flcluster will generate a spot report that tries to provide the cluster with
 some mode details.  For example:
 \verbatim
 dx 3512.4 K2LBM RTTY [85]       mode is RTTY, Mark frequency @ 3512.485
@@ -209,13 +230,13 @@ can then modify the spot report before actually submitting the report using
 the Submit button.
 
 \section s_dxcluster_reports DX cluster reports
-fldigi parses the received data stream and displays each dx spot in a tabular form on
+flcluster parses the received data stream and displays each dx spot in a tabular form on
 the "DX Reports" tab:
 <center>
 \image html dx-reports.png ""
 \image latex dx-reports.png "" width=5.0in
 </center>
-Left clicking on a spotted report line will transfer the frequency and mode to fldigi's
+If connected to fldigi, left clicking on a spotted report line will transfer the frequency and mode to fldigi's
 operating parameters.  The mode change is contingent on the mode being reported by the
 spotter and included in the 'Notes' block.
 <br>
@@ -244,7 +265,7 @@ of these controls will determine how flcluster calculates the transceiver suppre
 audio (waterfall) track points.  The computed values will be sent to fldigi when a spotted
 QSO is activated on the DX Reports tab.
 <br>
-If fldigi is currently running, the flcluster will connect as soon as the "connect to Fldigi" box
+If fldigi is currently executing, then flcluster will connect as soon as the "connect to Fldigi" box
 is checked.  flcluster will automatically connect to fldigi if you exit flcluster with that box checked.
 
 \subsection s_dxc_qsy_logic DX Cluster QSY logic
