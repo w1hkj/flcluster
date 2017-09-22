@@ -55,6 +55,10 @@
 
 #include "threads.h"
 
+#ifdef __MINGW32__
+#include "timeops.h"
+#endif
+
 using namespace std;
 
 #define MAX_LINES 65536

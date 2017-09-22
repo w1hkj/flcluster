@@ -29,6 +29,8 @@
 #ifndef __WIN32__
 #include <sys/socket.h>
 #include <netinet/in.h>
+#else
+#include "compat.h"
 #endif
 
 #include <stdlib.h>
@@ -757,10 +759,10 @@ void parse_cc11_line(string buffer)
 
 	if (!trim(dxcc.spotter_US_state).empty()) {
 		spot.append("^@.").append(trim(dxcc.spotter_US_state));
-		if (!trim(dxcc.call_grid_square).empty());
+		if (!trim(dxcc.call_grid_square).empty())
 			spot.append(" ").append(trim(dxcc.call_grid_square));
 	} else {
-		if (!trim(dxcc.call_grid_square).empty());
+		if (!trim(dxcc.call_grid_square).empty())
 			spot.append("^@.").append(trim(dxcc.call_grid_square));
 	}
 

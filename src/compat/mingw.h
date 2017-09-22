@@ -27,6 +27,21 @@
 #undef _WINSOCKAPI_
 #include <winsock2.h>
 
+#undef EADDRINUSE
+#define EADDRINUSE WSAEADDRINUSE
+
+#undef EISCONN
+#define EISCONN WSAEISCONN
+
+#undef EWOULDBLOCK
+#define EWOULDBLOCK WSAEWOULDBLOCK
+
+#undef EINPROGRESS
+#define EINPROGRESS WSAEINPROGRESS
+
+#undef EALREADY
+#define EALREADY WSAEALREADY
+
 #ifdef __cplusplus
 extern "C" {
 #endif
