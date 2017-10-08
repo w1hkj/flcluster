@@ -10,8 +10,6 @@ To compile flcluster you will need:
     development library and headers.  FLTK's multi-threading support is
     required.
 
-  * The samplerate (a.k.a. secret rabbit code) library.
-
   * The PNG library.
 
   * The libxft library.

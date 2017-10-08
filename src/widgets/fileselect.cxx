@@ -82,9 +82,6 @@
   - Some operating systems support certain OS specific options; see 
     Fl_Native_File_Chooser::options() for a list.
 
-  \image html Fl_Native_File_Chooser.png "The Fl_Native_File_Chooser on different platforms."
-  \image latex Fl_Native_File_Chooser.png "The Fl_Native_File_Chooser on different platforms" width=14cm
-
   enum Type {
     BROWSE_FILE = 0,			///< browse files (lets user choose one file)
     BROWSE_DIRECTORY,			///< browse directories (lets user choose one directory)

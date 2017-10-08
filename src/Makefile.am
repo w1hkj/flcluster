@@ -225,6 +225,8 @@ EXTRA_DIST += \
 	../scripts/builddist.sh \
 	../scripts/mkappbundle.sh \
 	../scripts/mknsisinst.sh \
+	../data/flcluster.xpm \
+	../data/flcluster.png \
 	../data/mac/Info.plist.in \
 	../data/mac/flcluster.icns \
 	$(flcluster_WIN32_SRC) \

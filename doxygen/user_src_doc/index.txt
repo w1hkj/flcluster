@@ -43,12 +43,12 @@ the "Enable Tooltlips" if you want a small tooltip popup window to display when 
 over an flcluster control.
 <br>
 
-flcluster needs to send occassionally send a backspace character (keepalive) to the cluster server.  The
-server echos backspace.  If the echo is not received within a 30 second window then the server
+flcluster needs to occassionally send a backspace character (keepalive) to the cluster server.  The
+server echos the backspace.  If the echo is not received within a 30 second window then the server
 connection is assumed to be down.  flcluster will attempt to reconnect if this occurs.  Receipt of
-a broadcast message such as a dx spot report will also serve to satisfy the echo receipt.  You
-can set the keepalive interval to 1, 5, or 10 minutes.  5 should probably suffice for most servers and
-internet paths.
+a broadcast message such as a dx spot report within the keepalive time interval will reset the
+timer.  You can set the keepalive interval to 1, 5, or 10 minutes.  5 should probably suffice for 
+most servers and internet paths.
 <br>
 <center>
 \image html user-info.png ""
@@ -91,7 +91,7 @@ to the connect controls.</li>
 <li>Highlight an entry and press the "Delete" button to delete an entry.</li>
 </ul>
 Press the "Servers" button if you are unfamiliar with the telnet address and 
-port number of a convenient dxcluster server.  fldigi will open up a local
+port number of a convenient dxcluster server.  flcluster will open up a local
 html document with a list of recently verified servers:
 <center>
 \image html dxc_servers.png ""
