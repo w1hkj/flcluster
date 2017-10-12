@@ -1,10 +1,17 @@
 
 
+=Version 1.0.1=
+
+2017-10-12  David Freese  <w1hkj@bellsouth.net>
+
+	d46e018: Application icon
+	926b7fd: Installation bugs
+	43e4059: win mingw
+	4a092db: doc update
+	c9021c0: Code revision #2
+
+
 =Version 1.0.0=
 
-2017-09-06  David Freese  <w1hkj@bellsouth.net>
-
-	e7acf2d: doc update
-	d6ce449: Code revision #2
 	c5373f2: Code Revision 1
 	926ee8e: Initial flcluster repository
