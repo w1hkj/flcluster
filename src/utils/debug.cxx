@@ -119,7 +119,6 @@ void debug::start(const char* filename)
 
 static char fmt[1024];
 static char sztemp[1024];
-static char strTime[64];
 
 /** ********************************************************
  *

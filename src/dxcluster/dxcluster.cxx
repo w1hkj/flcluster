@@ -65,6 +65,7 @@ int connection_timeout = 0;
 static char zdbuf[9] = "20120602";
 static char ztbuf[11] = "12:30:00 Z";
 
+/// write stream i/o to external text file 'dx_stream.txt'
 static void write_dxc_debug(char c, string txt)
 {
 	if (!dx_stream) return;
@@ -76,30 +77,11 @@ static void write_dxc_debug(char c, string txt)
 }
 
 // =====================================================================
-//
-// TOD_clock.cxx
-//
-// Copyright (C) 2017
-//		Dave Freese, W1HKJ
-//
-// This file is part of flcluster.
-//
-// Fldigi is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Fldigi is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with fldigi.  If not, see <http://www.gnu.org/licenses/>.
+/// TOD_clock
+/// separate thread used to maintain time synched to system clock
 // =====================================================================
 
 static pthread_t TOD_thread;
-//static pthread_mutex_t TOD_mutex     = PTHREAD_MUTEX_INITIALIZER;
 
 static unsigned long  _zmsec = 0;
 
@@ -117,12 +99,6 @@ const char* ztime(void)
 {
 	return ztbuf;
 }
-
-//void show_time(void *)
-//{
-//	txtTOD->value(ztbuf);
-//	txtTOD->redraw();
-//}
 
 void ztimer(void *)
 {
@@ -653,8 +629,8 @@ void parse_dxline(string dxbuffer)
 			isdigit(dxbuffer[p+3]) &&
 			(dxbuffer[p+4] == 'Z' || dxbuffer[4] == 'z')) {
 			dxc.time = dxbuffer.substr(p, 5);
-			if (dxbuffer.length() > p+5);
-			dxc.spotter_US_state = dxbuffer.substr(p+5);
+			if (dxbuffer.length() > p+5)
+				dxc.spotter_US_state = dxbuffer.substr(p+5);
 			dxbuffer.erase(p-1);
 		}
 		p++;
@@ -1179,7 +1155,7 @@ void parse_DXcluster_stream(string input_buffer)
 
 	}
 
-	if (keepalive > 0) {
+	if (wait_for_keepalive > 0) {
 		Fl::awake(restore_keepalive_box);
 		wait_for_keepalive = -1;
 	}
