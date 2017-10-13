@@ -1,8 +1,15 @@
 
 
-=Version 1.0.1=
+=Version 1.0.2=
 
 2017-10-12  David Freese  <w1hkj@bellsouth.net>
+
+	efe4c58: UI thread bug
+	cc846da: FreeBSD reported bugs
+	be720c4: Prog doc update
+
+
+=Version 1.0.1=
 
 	d46e018: Application icon
 	926b7fd: Installation bugs
