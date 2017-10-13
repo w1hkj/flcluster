@@ -561,6 +561,8 @@ void update_brws_dx_cluster(void *)
 
 	string dxc_line;
 
+	dxc_colors_fonts();
+
 	while (!dxclines.empty()) {
 		dxc_line = dxclines.front();
 		dxclines.pop();
@@ -596,8 +598,6 @@ void update_brws_dx_cluster(void *)
 
 void parse_dxline(string dxbuffer)
 {
-	dxc_colors_fonts();
-
 	guard_lock dxcc_lock(&dxc_line_mutex);
 
 	dxinfo dxc;
