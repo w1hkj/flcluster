@@ -82,11 +82,16 @@ static void cb_mnuExit(Fl_Menu_*, void*) {
   cb_Exit();
 }
 
+static void cb_mnu_help(Fl_Menu_*, void*) {
+  show_help();
+}
+
 unsigned char menu__i18n_done = 0;
 Fl_Menu_Item menu_[] = {
  {"File", 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {"E&xit", 0,  (Fl_Callback*)cb_mnuExit, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
+ {"Help", 0,  (Fl_Callback*)cb_mnu_help, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0}
 };
 
@@ -406,10 +411,6 @@ Fl_Check_Button *btn_connect_to_fldigi=(Fl_Check_Button *)0;
 
 static void cb_btn_connect_to_fldigi(Fl_Check_Button* o, void*) {
   progStatus.connect_to_fldigi = o->value();
-if (o->value()) {
-progStatus.connect_to_flrig = 0;
-btn_connect_to_flrig->value(0);
-};
 }
 
 Fl_Input *inp_fldigi_address=(Fl_Input *)0;
@@ -424,27 +425,7 @@ static void cb_inp_fldigi_port(Fl_Input* o, void*) {
   progStatus.fldigi_port=o->value();
 }
 
-Fl_Check_Button *btn_connect_to_flrig=(Fl_Check_Button *)0;
-
-static void cb_btn_connect_to_flrig(Fl_Check_Button* o, void*) {
-  progStatus.connect_to_flrig = o->value();
-if (o->value()) {
-progStatus.connect_to_fldigi = 0;
-btn_connect_to_fldigi->value(0);
-};
-}
-
-Fl_Input *inp_flrig_address=(Fl_Input *)0;
-
-static void cb_inp_flrig_address(Fl_Input* o, void*) {
-  progStatus.flrig_address=o->value();
-}
-
-Fl_Input *inp_flrig_port=(Fl_Input *)0;
-
-static void cb_inp_flrig_port(Fl_Input* o, void*) {
-  progStatus.flrig_port=o->value();
-}
+Fl_Box *lbl_fldigi_connected=(Fl_Box *)0;
 
 Fl_Counter *intPSKsweetspot=(Fl_Counter *)0;
 
@@ -509,7 +490,29 @@ static void cb_intRTTYsweetspot(Fl_Counter* o, void*) {
   progStatus.RTTYsweetspot=(int)o->value();
 }
 
-Fl_Box *lbl_fldigi_connected=(Fl_Box *)0;
+Fl_Input *serversURL=(Fl_Input *)0;
+
+static void cb_serversURL(Fl_Input* o, void*) {
+  progStatus.serversURL=o->value();
+}
+
+Fl_Input *AR_help_URL=(Fl_Input *)0;
+
+static void cb_AR_help_URL(Fl_Input* o, void*) {
+  progStatus.AR_help_URL=o->value();
+}
+
+Fl_Input *CC_help_URL=(Fl_Input *)0;
+
+static void cb_CC_help_URL(Fl_Input* o, void*) {
+  progStatus.CC_help_URL=o->value();
+}
+
+Fl_Input *DX_help_URL=(Fl_Input *)0;
+
+static void cb_DX_help_URL(Fl_Input* o, void*) {
+  progStatus.DX_help_URL=o->value();
+}
 
 Fl_Group *gp_resize_io=(Fl_Group *)0;
 
@@ -804,7 +807,7 @@ Fl_Double_Window* dxc_window() {
     { Fl_Menu_Bar* o = new Fl_Menu_Bar(0, 0, 680, 22);
       if (!menu__i18n_done) {
         int i=0;
-        for ( ; i<2; i++)
+        for ( ; i<4; i++)
           if (menu_[i].label())
             menu_[i].label(_(menu_[i].label()));
         menu__i18n_done = 1;
@@ -1290,7 +1293,7 @@ Fl_Double_Window* dxc_window() {
       } // Fl_Group* tabDXclusterConfig
       { Fl_Group* o = tabIOconfig = new Fl_Group(0, 100, 680, 315, _("I/O config"));
         tabIOconfig->hide();
-        { Fl_Group* o = new Fl_Group(10, 110, 660, 272, _("Fldigi/Flrig Interface"));
+        { Fl_Group* o = new Fl_Group(10, 110, 389, 150, _("Fldigi/Flrig Interface"));
           o->box(FL_ENGRAVED_FRAME);
           o->align(Fl_Align(FL_ALIGN_TOP|FL_ALIGN_INSIDE));
           { Fl_Check_Button* o = btn_connect_to_fldigi = new Fl_Check_Button(25, 143, 142, 15, _("Connect to Fldigi"));
@@ -1309,26 +1312,18 @@ Fl_Double_Window* dxc_window() {
             inp_fldigi_port->align(Fl_Align(FL_ALIGN_TOP_LEFT));
             o->value(progStatus.fldigi_port.c_str());
           } // Fl_Input* inp_fldigi_port
-          { Fl_Check_Button* o = btn_connect_to_flrig = new Fl_Check_Button(25, 271, 142, 15, _("Connect to Flrig"));
-            btn_connect_to_flrig->down_box(FL_DOWN_BOX);
-            btn_connect_to_flrig->callback((Fl_Callback*)cb_btn_connect_to_flrig);
-            btn_connect_to_flrig->when(FL_WHEN_CHANGED);
-            btn_connect_to_flrig->hide();
-            o->value(progStatus.connect_to_flrig);
-          } // Fl_Check_Button* btn_connect_to_flrig
-          { Fl_Input* o = inp_flrig_address = new Fl_Input(25, 308, 357, 24, _("Fldigi Socket Address:"));
-            inp_flrig_address->callback((Fl_Callback*)cb_inp_flrig_address);
-            inp_flrig_address->align(Fl_Align(FL_ALIGN_TOP_LEFT));
-            inp_flrig_address->hide();
-            o->value(progStatus.flrig_address.c_str());
-          } // Fl_Input* inp_flrig_address
-          { Fl_Input* o = inp_flrig_port = new Fl_Input(25, 354, 123, 24, _("Fldigi Socket Port:"));
-            inp_flrig_port->callback((Fl_Callback*)cb_inp_flrig_port);
-            inp_flrig_port->align(Fl_Align(FL_ALIGN_TOP_LEFT));
-            inp_flrig_port->hide();
-            o->value(progStatus.flrig_port.c_str());
-          } // Fl_Input* inp_flrig_port
-          { Fl_Counter* o = intPSKsweetspot = new Fl_Counter(420, 139, 119, 22, _("PSK sweet spot"));
+          { lbl_fldigi_connected = new Fl_Box(185, 140, 20, 20, _("Connected"));
+            lbl_fldigi_connected->tooltip(_("Connected State"));
+            lbl_fldigi_connected->box(FL_DIAMOND_DOWN_BOX);
+            lbl_fldigi_connected->color((Fl_Color)55);
+            lbl_fldigi_connected->align(Fl_Align(FL_ALIGN_RIGHT));
+          } // Fl_Box* lbl_fldigi_connected
+          o->end();
+        } // Fl_Group* o
+        { Fl_Group* o = new Fl_Group(400, 110, 269, 296, _("RF/AF Spotting"));
+          o->box(FL_ENGRAVED_BOX);
+          o->align(Fl_Align(FL_ALIGN_TOP|FL_ALIGN_INSIDE));
+          { Fl_Counter* o = intPSKsweetspot = new Fl_Counter(420, 149, 119, 22, _("PSK sweet spot"));
             intPSKsweetspot->minimum(500);
             intPSKsweetspot->maximum(2500);
             intPSKsweetspot->step(10);
@@ -1338,12 +1333,12 @@ Fl_Double_Window* dxc_window() {
             o->value(progStatus.PSKsweetspot);
             o->lstep(100);
           } // Fl_Counter* intPSKsweetspot
-          { Fl_Check_Button* o = btn_PSK_on_USB = new Fl_Check_Button(435, 174, 198, 15, _("PSK mode is USB on xcvr"));
+          { Fl_Check_Button* o = btn_PSK_on_USB = new Fl_Check_Button(435, 184, 198, 15, _("PSK mode is USB on xcvr"));
             btn_PSK_on_USB->down_box(FL_DOWN_BOX);
             btn_PSK_on_USB->callback((Fl_Callback*)cb_btn_PSK_on_USB);
             o->value(progStatus.USB);
           } // Fl_Check_Button* btn_PSK_on_USB
-          { Fl_Counter* o = intCWsweetspot = new Fl_Counter(420, 203, 119, 22, _("CW sweet spot"));
+          { Fl_Counter* o = intCWsweetspot = new Fl_Counter(420, 213, 119, 22, _("CW sweet spot"));
             intCWsweetspot->minimum(500);
             intCWsweetspot->maximum(2500);
             intCWsweetspot->step(10);
@@ -1353,27 +1348,27 @@ Fl_Double_Window* dxc_window() {
             o->value(progStatus.CWsweetspot);
             o->lstep(100);
           } // Fl_Counter* intCWsweetspot
-          { Fl_Check_Button* o = btn_cw_mode_is_USB = new Fl_Check_Button(435, 239, 198, 15, _("CW mode is USB on xcvr"));
+          { Fl_Check_Button* o = btn_cw_mode_is_USB = new Fl_Check_Button(435, 249, 198, 15, _("CW mode is USB on xcvr"));
             btn_cw_mode_is_USB->down_box(FL_DOWN_BOX);
             btn_cw_mode_is_USB->callback((Fl_Callback*)cb_btn_cw_mode_is_USB);
             o->value(progStatus.USBCW);
           } // Fl_Check_Button* btn_cw_mode_is_USB
-          { Fl_Check_Button* o = btn_cw_mode_is_LSB = new Fl_Check_Button(435, 267, 198, 15, _("CW mode is LSB on xcvr"));
+          { Fl_Check_Button* o = btn_cw_mode_is_LSB = new Fl_Check_Button(435, 277, 198, 15, _("CW mode is LSB on xcvr"));
             btn_cw_mode_is_LSB->down_box(FL_DOWN_BOX);
             btn_cw_mode_is_LSB->callback((Fl_Callback*)cb_btn_cw_mode_is_LSB);
             o->value(progStatus.LSBCW);
           } // Fl_Check_Button* btn_cw_mode_is_LSB
-          { Fl_Check_Button* o = btn_cw_mode_is_CW = new Fl_Check_Button(435, 295, 198, 15, _("CW mode is CW on xcvr"));
+          { Fl_Check_Button* o = btn_cw_mode_is_CW = new Fl_Check_Button(435, 305, 198, 15, _("CW mode is CW on xcvr"));
             btn_cw_mode_is_CW->down_box(FL_DOWN_BOX);
             btn_cw_mode_is_CW->callback((Fl_Callback*)cb_btn_cw_mode_is_CW);
             o->value(!progStatus.LSBCW && !progStatus.USBCW);
           } // Fl_Check_Button* btn_cw_mode_is_CW
-          { Fl_Check_Button* o = btn_rtty_is_mark = new Fl_Check_Button(435, 360, 198, 15, _("RTTY tuned to Mark Freq"));
+          { Fl_Check_Button* o = btn_rtty_is_mark = new Fl_Check_Button(435, 370, 198, 15, _("RTTY tuned to Mark Freq"));
             btn_rtty_is_mark->down_box(FL_DOWN_BOX);
             btn_rtty_is_mark->callback((Fl_Callback*)cb_btn_rtty_is_mark);
             o->value(!progStatus.useMARKfreq);
           } // Fl_Check_Button* btn_rtty_is_mark
-          { Fl_Counter* o = intRTTYsweetspot = new Fl_Counter(420, 324, 119, 22, _("RTTY sweet spot"));
+          { Fl_Counter* o = intRTTYsweetspot = new Fl_Counter(420, 334, 119, 22, _("RTTY sweet spot"));
             intRTTYsweetspot->minimum(500);
             intRTTYsweetspot->maximum(2500);
             intRTTYsweetspot->step(10);
@@ -1383,15 +1378,34 @@ Fl_Double_Window* dxc_window() {
             o->value(progStatus.RTTYsweetspot);
             o->lstep(100);
           } // Fl_Counter* intRTTYsweetspot
-          { lbl_fldigi_connected = new Fl_Box(185, 140, 20, 20, _("Connected"));
-            lbl_fldigi_connected->tooltip(_("Connected State"));
-            lbl_fldigi_connected->box(FL_DIAMOND_DOWN_BOX);
-            lbl_fldigi_connected->color((Fl_Color)55);
-            lbl_fldigi_connected->align(Fl_Align(FL_ALIGN_RIGHT));
-          } // Fl_Box* lbl_fldigi_connected
           o->end();
         } // Fl_Group* o
-        { gp_resize_io = new Fl_Group(10, 388, 660, 15);
+        { Fl_Group* o = new Fl_Group(10, 261, 389, 145, _("Server Help URLs"));
+          o->box(FL_ENGRAVED_BOX);
+          o->align(Fl_Align(FL_ALIGN_TOP|FL_ALIGN_INSIDE));
+          { Fl_Input* o = serversURL = new Fl_Input(58, 285, 337, 24, _("Srvrs:"));
+            serversURL->tooltip(_("enter INTERNAL to use local html"));
+            serversURL->callback((Fl_Callback*)cb_serversURL);
+            o->value(progStatus.serversURL.c_str());
+          } // Fl_Input* serversURL
+          { Fl_Input* o = AR_help_URL = new Fl_Input(58, 313, 337, 24, _("AR:"));
+            AR_help_URL->tooltip(_("enter INTERNAL to use local html"));
+            AR_help_URL->callback((Fl_Callback*)cb_AR_help_URL);
+            o->value(progStatus.AR_help_URL.c_str());
+          } // Fl_Input* AR_help_URL
+          { Fl_Input* o = CC_help_URL = new Fl_Input(58, 342, 337, 24, _("CC:"));
+            CC_help_URL->tooltip(_("enter INTERNAL to use local html"));
+            CC_help_URL->callback((Fl_Callback*)cb_CC_help_URL);
+            o->value(progStatus.CC_help_URL.c_str());
+          } // Fl_Input* CC_help_URL
+          { Fl_Input* o = DX_help_URL = new Fl_Input(58, 371, 337, 24, _("DX:"));
+            DX_help_URL->tooltip(_("enter INTERNAL to use local html"));
+            DX_help_URL->callback((Fl_Callback*)cb_DX_help_URL);
+            o->value(progStatus.DX_help_URL.c_str());
+          } // Fl_Input* DX_help_URL
+          o->end();
+        } // Fl_Group* o
+        { gp_resize_io = new Fl_Group(10, 407, 660, 5);
           gp_resize_io->end();
         } // Fl_Group* gp_resize_io
         o->resizable(gp_resize_io);

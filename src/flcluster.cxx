@@ -408,7 +408,7 @@ void open_url(const char* url)
  ***********************************************************/
 void show_help()
 {
-//	open_url("http://www.w1hkj.com/flcluster-help/index.html");
+	open_url("http://www.w1hkj.com/flcluster-help/index.html");
 }
 
 /** ********************************************************

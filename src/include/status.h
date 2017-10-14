@@ -108,6 +108,12 @@ struct status {
 
 	bool tooltips;
 
+// help URLs
+	std::string serversURL;
+	std::string AR_help_URL;
+	std::string CC_help_URL;
+	std::string DX_help_URL;
+
 	bool changed;
 	void saveLastState();
 	void loadLastState();

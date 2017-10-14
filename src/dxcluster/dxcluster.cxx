@@ -761,15 +761,14 @@ void update_brws_dxc_help(void *)
 	brws_dxc_help->redraw();
 }
 
-static string helpbuff;
-
-void show_help_line(void *) //string buff)
+void show_help_line(std::string helpbuff) //void *)
 {
 	guard_lock brws_lock(&brws_dxc_help_mutex);
 	help_que.push(helpbuff.append("\n"));
 	Fl::awake(update_brws_dxc_help);
 
 	write_dxc_debug('H', helpbuff);
+	helpbuff.clear();
 }
 
 enum server_type {NIL, DX_SPIDER, AR_CLUSTER, CC_CLUSTER};
@@ -1128,7 +1127,8 @@ void parse_DXcluster_stream(string input_buffer)
 			continue;
 		}
 
-		if (ucasebuffer.find("HELP") != string::npos) {
+		if ((ucasebuffer.find("HELP") != string::npos) ||
+			(ucasebuffer.find("APROPOS") != string::npos)){
 			help_lines = true;
 		}
 		if (ucasebuffer.find(its_me) != string::npos) {
@@ -1136,8 +1136,7 @@ void parse_DXcluster_stream(string input_buffer)
 			continue;
 		}
 		if (help_lines) {
-			helpbuff = buffer;
-			Fl::awake(show_help_line);//(buffer);
+			show_help_line(buffer);
 			continue;
 		}
 
@@ -1201,9 +1200,9 @@ void DXcluster_recv_data()
 //
 //======================================================================
 const char *default_help[]={
-"Help available after logging on",
-"Try URL: k4zr.no-ip.org, PORT 7300",
-"",
+"Help available after logging on\n",
+"Try URL: k4zr.no-ip.org, PORT 7300\n",
+"\n",
 "Visit http://www.dxcluster.info/telnet/ for a listing of dx cluster servers",
 NULL };
 
@@ -1226,6 +1225,8 @@ void dxc_help_query()
 		if (inp_help_string->value()[0]) {
 			string helptype = inp_help_string->value();
 			if (ucasestr(helptype).find("HELP") != string::npos)
+				sendbuf = helptype;
+			else if (ucasestr(helptype).find("APROPOS") != string::npos)
 				sendbuf = helptype;
 			else
 				sendbuf.append(" ").append(helptype);
@@ -2002,61 +2003,57 @@ void dxcluster_hosts_send_setup(Fl_Button*, void*)
 #include "arc-help.cxx"
 void dxcluster_ar_help(Fl_Button*, void*)
 {
-	string fn_help = HelpDir;
-	fn_help.append("arc_help.html");
-	ifstream f_help(fn_help.c_str());
-	if (!f_help) {
-		ofstream fo_help(fn_help.c_str());
-		fo_help << arc_commands;
-		fo_help.close();
+	if (progStatus.AR_help_URL == "INTERNAL") {
+		string fn_help = HelpDir;
+		fn_help.append("arc_help.html");
+			ofstream fo_help(fn_help.c_str());
+			fo_help << arc_commands;
+			fo_help.close();
+		open_url(fn_help.c_str());
 	} else
-		f_help.close();
-	open_url(fn_help.c_str());
+		open_url(progStatus.AR_help_URL.c_str());
 }
 
 #include "CCC_Commands.cxx"
 void dxcluster_cc_help(Fl_Button*, void*)
 {
-	string fn_help = HelpDir;
-	fn_help.append("ccc_help.html");
-	ifstream f_help(fn_help.c_str());
-	if (!f_help) {
-		ofstream fo_help(fn_help.c_str());
-		fo_help << ccc_commands;
-		fo_help.close();
+	if (progStatus.CC_help_URL == "INTERNAL") {
+		string fn_help = HelpDir;
+		fn_help.append("ccc_help.html");
+			ofstream fo_help(fn_help.c_str());
+			fo_help << ccc_commands;
+			fo_help.close();
+		open_url(fn_help.c_str());
 	} else
-		f_help.close();
-	open_url(fn_help.c_str());
+		open_url(progStatus.CC_help_URL.c_str());
 }
 
 #include "DXSpiderCommandReference.cxx"
 void dxcluster_dx_help(Fl_Button*, void*)
 {
-	string fn_help = HelpDir;
-	fn_help.append("dxc_help.html");
-	ifstream f_help(fn_help.c_str());
-	if (!f_help) {
-		ofstream fo_help(fn_help.c_str());
-		fo_help << dxspider_cmds;
-		fo_help.close();
+	if (progStatus.DX_help_URL == "INTERNAL") {
+		string fn_help = HelpDir;
+		fn_help.append("dxc_help.html");
+			ofstream fo_help(fn_help.c_str());
+			fo_help << dxspider_cmds;
+			fo_help.close();
+		open_url(fn_help.c_str());
 	} else
-		f_help.close();
-	open_url(fn_help.c_str());
+		open_url(progStatus.DX_help_URL.c_str());
 }
 
 #include "DXClusterServers.cxx"
 void dxcluster_servers(Fl_Button*, void*)
 {
-	string fn_help = HelpDir;
-	fn_help.append("dxc_servers.html");
-	ifstream f_help(fn_help.c_str());
-	if (!f_help) {
-		ofstream fo_help(fn_help.c_str());
-		fo_help << dxcc_servers;
-		fo_help.close();
+	if (progStatus.serversURL == "INTERNAL") {
+		string fn_help = HelpDir;
+		fn_help.append("dxc_servers.html");
+			ofstream fo_help(fn_help.c_str());
+			fo_help << dxcc_servers;
+			fo_help.close();
+		open_url(fn_help.c_str());
 	} else
-		f_help.close();
-	open_url(fn_help.c_str());
+		open_url(progStatus.serversURL.c_str());
 }
 
 void dxc_click_m1(Fl_Button*, void*)

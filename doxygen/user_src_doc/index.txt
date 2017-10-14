@@ -21,7 +21,7 @@
 
 \tableofcontents
 
-<!--FLCLUSTER User Manual-->
+<!--flcluster-help-->
 \section flclusterDesc FLCLUSTER Description
 
 <b>FLCLUSTER</b> is a program for accessing dxcluster nodes.
@@ -98,6 +98,8 @@ html document with a list of recently verified servers:
 \image latex dxc_servers.png "" width=5.0in
 </center>
 <br>
+You can configure flcluster to open a www page for the "Srvrs", "AR ?", "CC ?", and "DX ?"
+buttons.  See \ref server_help_urls "Server Help URLs".
 
 With the exception of the cluster server setup commands (next section), flcluster
 will automatically save changes that you make in it's configuration.  flcluster
@@ -157,7 +159,7 @@ connected to fldigi for this to work.
 Enable the "Auto Connect" if you want to connect to the host when starting
 fldigi.
 
-\subsection s_cluster_colors DX cluster color scheme
+\section s_cluster_colors DX cluster color scheme
 You can change the text colors, and text fonts on the User config tab.
 
 <center>
@@ -229,7 +231,7 @@ Pressing either of the SPOT buttons only adds the spot report to the Cmd: contro
 can then modify the spot report before actually submitting the report using
 the Submit button.
 
-\section s_dxcluster_reports DX cluster reports
+\subsection s_dxcluster_reports DX cluster reports
 flcluster parses the received data stream and displays each dx spot in a tabular form on
 the "DX Reports" tab:
 <center>
@@ -244,12 +246,12 @@ spotter and included in the 'Notes' block.
 You can elect to view the reports with the most recent on either the top or
 the bottom of the list.
 
-\subsection fldigi_io_interface Connecting to fldigi
+\section io_interface I/O Interface
 <center>
 \image html i-o-config.png ""
 \image latex i-o-config.png "" width=5.0in
 </center>
-<br>
+\subsection fldigi_io Fldigi Interface
 Use the default address and port entries for fldigi, unless you have specifically
 changed those for the currently running fldigi.  flcluster and fldigi do not have
 to be executing on the same computer.  Enter the address as a LAN or WAN URL or
@@ -258,17 +260,19 @@ socket address as appropriate.
 <li>Socket address: 127.0.0.1</li>
 <li>Socket port   : 7362</li>
 </ul>
+If fldigi is currently executing, then flcluster will connect as soon as the "connect to Fldigi" box
+is checked.  flcluster will automatically connect to fldigi if you exit flcluster with that box checked.
+
+\subsection s_dxc_qsy_logic DX Cluster QSY logic
 Set the PSK, CW and RTTY sweet spots to be identical to those in fldigi.
 <br>
+
 The xcvr set up and RTTY Mark Freq check boxes should be self explanatory.  The state
 of these controls will determine how flcluster calculates the transceiver suppressed carrier /
 audio (waterfall) track points.  The computed values will be sent to fldigi when a spotted
 QSO is activated on the DX Reports tab.
 <br>
-If fldigi is currently executing, then flcluster will connect as soon as the "connect to Fldigi" box
-is checked.  flcluster will automatically connect to fldigi if you exit flcluster with that box checked.
 
-\subsection s_dxc_qsy_logic DX Cluster QSY logic
 A cluster spot report line has this format:
 \verbatim
 -SPOTTER---<-FREQ--><--DX STA---><----------NOTES--------------><-UTC><LOC--
@@ -296,6 +300,19 @@ know what mode he or she is interested in.  Are you spotting SSB, then change
 the fldigi mode to SSB.  Are you interested in CW?  Then change the mode to
 CW.  This is really a KISS approach that is constrained by the very limited
 amount of data contained in the DX spot report.
+
+\subsection server_help_urls Server Help URLs
+flcluster can generate a set of html pages for
+<ul>
+<li>Cluster servers - Srvrs</li>
+<li>AR cluster help - AR</li>
+<li>CC cluster help - CC</li>
+<li>DX cluster help - DX</li>
+</ul>
+The internal html pages will be viewed when INTERNAL is specified as the respective URL.
+You can enter a web page for any of the four pages.  Use the standard entry that would
+be in the URL bar of a web browser.
+
 \section s_cluster_help On Line Cluster Help
 The Help tab provides a convenient access to help obtained directly from the dxcluster
 server.  It is the equivalent of using the HELP command from the Cmd: control.  The

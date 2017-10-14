@@ -2,7 +2,7 @@
 #
 # A simple script for creating/archiving doxygen documentation for FLcluster
 
-PRG_NAME="FLcluster"
+PRG_NAME="flcluster"
 
 LATEX="0"
 DOXY="0"
@@ -260,8 +260,8 @@ if [ $BUILD_USER_DOCS -eq "1" ]; then
 	cd user_src_doc
 	doc_version "${PWD}/Doxyfile"
 	check_doxy
-	( compress_html "${PRG_NAME}_${VER_NUM}_Users_Manual" "user_docs")
-	pdf_docs "../../doc/user_docs/latex" "../../pdf/${PRG_NAME}_${VER_NUM}_Users_Manual.pdf"
+	( compress_html "${PRG_NAME}-help" "user_docs")
+	pdf_docs "../../doc/user_docs/latex" "../../pdf/${PRG_NAME}-help.pdf"
 )
 fi
 

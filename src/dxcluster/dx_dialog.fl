@@ -102,11 +102,11 @@ Function {dxc_window()} {open
   code {font_browser = new Font_Browser;} {}
   Fl_Window {} {
     label {DX Cluster Spotting} open
-    xywh {872 24 680 420} type Double resizable
+    xywh {891 28 680 420} type Double resizable
     code0 {o->resizable(cluster_tabs);}
     code1 {o->size_range(680,420,0,0);} visible
   } {
-    Fl_Menu_Bar {} {open
+    Fl_Menu_Bar {} {open selected
       xywh {0 0 680 22}
     } {
       Submenu mnuFile {
@@ -118,6 +118,11 @@ Function {dxc_window()} {open
           callback {cb_Exit();}
           xywh {0 0 36 20}
         }
+      }
+      MenuItem mnu_help {
+        label Help
+        callback {show_help();}
+        xywh {0 0 36 20}
       }
     }
     Fl_Group btn_select_host {
@@ -322,7 +327,7 @@ dxc_column_widths();}
         }
       }
       Fl_Group tabDXclusterConfig {
-        label {Cluster Config} open selected
+        label {Cluster Config} open
         tooltip {Initialization strings for telnet cluster host} xywh {0 100 680 314}
         code0 {o->resizable(cc_resize_1);}
       } {
@@ -575,15 +580,11 @@ progStatus.changed=true;}
       } {
         Fl_Group {} {
           label {Fldigi/Flrig Interface} open
-          xywh {10 110 660 272} box ENGRAVED_FRAME align 17
+          xywh {10 110 389 150} box ENGRAVED_FRAME align 17
         } {
           Fl_Check_Button btn_connect_to_fldigi {
             label {Connect to Fldigi}
-            callback {progStatus.connect_to_fldigi = o->value();
-if (o->value()) {
-progStatus.connect_to_flrig = 0;
-btn_connect_to_flrig->value(0);
-}}
+            callback {progStatus.connect_to_fldigi = o->value();}
             xywh {25 143 142 15} down_box DOWN_BOX when 1
             code0 {o->value(progStatus.connect_to_fldigi);}
           }
@@ -599,45 +600,32 @@ btn_connect_to_flrig->value(0);
             xywh {25 225 123 24} align 5
             code0 {o->value(progStatus.fldigi_port.c_str());}
           }
-          Fl_Check_Button btn_connect_to_flrig {
-            label {Connect to Flrig}
-            callback {progStatus.connect_to_flrig = o->value();
-if (o->value()) {
-progStatus.connect_to_fldigi = 0;
-btn_connect_to_fldigi->value(0);
-}}
-            xywh {25 271 142 15} down_box DOWN_BOX when 1 hide
-            code0 {o->value(progStatus.connect_to_flrig);}
+          Fl_Box lbl_fldigi_connected {
+            label Connected
+            tooltip {Connected State} xywh {185 140 20 20} box DIAMOND_DOWN_BOX color 55 align 8
           }
-          Fl_Input inp_flrig_address {
-            label {Fldigi Socket Address:}
-            callback {progStatus.flrig_address=o->value();}
-            xywh {25 308 357 24} align 5 hide
-            code0 {o->value(progStatus.flrig_address.c_str());}
-          }
-          Fl_Input inp_flrig_port {
-            label {Fldigi Socket Port:}
-            callback {progStatus.flrig_port=o->value();}
-            xywh {25 354 123 24} align 5 hide
-            code0 {o->value(progStatus.flrig_port.c_str());}
-          }
+        }
+        Fl_Group {} {
+          label {RF/AF Spotting}
+          xywh {400 110 269 296} box ENGRAVED_BOX align 17
+        } {
           Fl_Counter intPSKsweetspot {
             label {PSK sweet spot}
             callback {progStatus.PSKsweetspot=(int)o->value();}
-            xywh {420 139 119 22} align 8 minimum 500 maximum 2500 step 10 value 1500
+            xywh {420 149 119 22} align 8 minimum 500 maximum 2500 step 10 value 1500
             code0 {o->value(progStatus.PSKsweetspot);}
             code1 {o->lstep(100);}
           }
           Fl_Check_Button btn_PSK_on_USB {
             label {PSK mode is USB on xcvr}
             callback {progStatus.USB = o->value();}
-            xywh {435 174 198 15} down_box DOWN_BOX
+            xywh {435 184 198 15} down_box DOWN_BOX
             code0 {o->value(progStatus.USB);}
           }
           Fl_Counter intCWsweetspot {
             label {CW sweet spot}
             callback {progStatus.CWsweetspot=(int)o->value();}
-            xywh {420 203 119 22} align 8 minimum 500 maximum 2500 step 10 value 1500
+            xywh {420 213 119 22} align 8 minimum 500 maximum 2500 step 10 value 1500
             code0 {o->value(progStatus.CWsweetspot);}
             code1 {o->lstep(100);}
           }
@@ -649,7 +637,7 @@ if (progStatus.USBCW) {
   btn_cw_mode_is_LSB->value(0);
   btn_cw_mode_is_CW->value(0);
 }}
-            xywh {435 239 198 15} down_box DOWN_BOX
+            xywh {435 249 198 15} down_box DOWN_BOX
             code0 {o->value(progStatus.USBCW);}
           }
           Fl_Check_Button btn_cw_mode_is_LSB {
@@ -660,7 +648,7 @@ if (progStatus.LSBCW) {
   btn_cw_mode_is_USB->value(0);
   btn_cw_mode_is_CW->value(0);
 }}
-            xywh {435 267 198 15} down_box DOWN_BOX
+            xywh {435 277 198 15} down_box DOWN_BOX
             code0 {o->value(progStatus.LSBCW);}
           }
           Fl_Check_Button btn_cw_mode_is_CW {
@@ -671,29 +659,54 @@ if (progStatus.LSBCW) {
   btn_cw_mode_is_USB->value(0);
   btn_cw_mode_is_LSB->value(0);
 }}
-            xywh {435 295 198 15} down_box DOWN_BOX
+            xywh {435 305 198 15} down_box DOWN_BOX
             code0 {o->value(!progStatus.LSBCW && !progStatus.USBCW);}
           }
           Fl_Check_Button btn_rtty_is_mark {
             label {RTTY tuned to Mark Freq}
             callback {progStatus.useMARKfreq = o->value();}
-            xywh {435 360 198 15} down_box DOWN_BOX
+            xywh {435 370 198 15} down_box DOWN_BOX
             code0 {o->value(!progStatus.useMARKfreq);}
           }
           Fl_Counter intRTTYsweetspot {
             label {RTTY sweet spot}
             callback {progStatus.RTTYsweetspot=(int)o->value();}
-            xywh {420 324 119 22} align 8 minimum 500 maximum 2500 step 10 value 1500
+            xywh {420 334 119 22} align 8 minimum 500 maximum 2500 step 10 value 1500
             code0 {o->value(progStatus.RTTYsweetspot);}
             code1 {o->lstep(100);}
           }
-          Fl_Box lbl_fldigi_connected {
-            label Connected
-            tooltip {Connected State} xywh {185 140 20 20} box DIAMOND_DOWN_BOX color 55 align 8
+        }
+        Fl_Group {} {
+          label {Server Help URLs}
+          xywh {10 261 389 145} box ENGRAVED_BOX align 17
+        } {
+          Fl_Input serversURL {
+            label {Srvrs:}
+            callback {progStatus.serversURL=o->value();}
+            tooltip {enter INTERNAL to use local html} xywh {58 285 337 24}
+            code0 {o->value(progStatus.serversURL.c_str());}
+          }
+          Fl_Input AR_help_URL {
+            label {AR:}
+            callback {progStatus.AR_help_URL=o->value();}
+            tooltip {enter INTERNAL to use local html} xywh {58 313 337 24}
+            code0 {o->value(progStatus.AR_help_URL.c_str());}
+          }
+          Fl_Input CC_help_URL {
+            label {CC:}
+            callback {progStatus.CC_help_URL=o->value();}
+            tooltip {enter INTERNAL to use local html} xywh {58 342 337 24}
+            code0 {o->value(progStatus.CC_help_URL.c_str());}
+          }
+          Fl_Input DX_help_URL {
+            label {DX:}
+            callback {progStatus.DX_help_URL=o->value();}
+            tooltip {enter INTERNAL to use local html} xywh {58 371 337 24}
+            code0 {o->value(progStatus.DX_help_URL.c_str());}
           }
         }
-        Fl_Group gp_resize_io {open
-          xywh {10 388 660 15}
+        Fl_Group gp_resize_io {
+          xywh {10 407 660 5}
         } {}
       }
       Fl_Group tabUserConfig {

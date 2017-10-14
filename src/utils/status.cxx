@@ -114,7 +114,13 @@ status progStatus = {
 	"12345",		// std::string flrig_port;
 
 	true,			// bool tooltips
-	false,			// bool changed;
+
+	"http://www.dxcluster.info/telnet/index.php",	// std::string serversURL;
+	"INTERNAL",		// std::string AR_help_URL;
+	"INTERNAL",		// std::string CC_help_URL;
+	"INTERNAL",		// std::string DX_help_URL;
+
+	false			// bool changed;
 
 };
 
@@ -211,6 +217,11 @@ void status::saveLastState()
 	FLCLUSTERpref.set("connect_to_flrig", connect_to_flrig);
 	FLCLUSTERpref.set("flrig_address", flrig_address.c_str());
 	FLCLUSTERpref.set("flrig_port", flrig_port.c_str());
+// cluster server URLs
+	FLCLUSTERpref.set("serversURL", serversURL.c_str());
+	FLCLUSTERpref.set("AR_help_URL", AR_help_URL.c_str());
+	FLCLUSTERpref.set("CC_help_URL", CC_help_URL.c_str());
+	FLCLUSTERpref.set("DX_help_URL", DX_help_URL.c_str());
 
 	FLCLUSTERpref.set("tooltips", tooltips);
 }
@@ -384,6 +395,16 @@ void status::loadLastState()
 		flrig_address = defbuffer; free(defbuffer);
 		FLCLUSTERpref.get("flrig_port",  defbuffer, "");
 		flrig_port = defbuffer; free(defbuffer);
+
+// cluster server URLs
+		FLCLUSTERpref.get("serversURL", defbuffer, serversURL.c_str());
+		serversURL = defbuffer; free(defbuffer);
+		FLCLUSTERpref.get("AR_help_URL", defbuffer, AR_help_URL.c_str());
+		AR_help_URL = defbuffer; free(defbuffer);
+		FLCLUSTERpref.get("CC_help_URL", defbuffer, CC_help_URL.c_str());
+		CC_help_URL = defbuffer; free(defbuffer);
+		FLCLUSTERpref.get("DX_help_URL", defbuffer, DX_help_URL.c_str());
+		DX_help_URL = defbuffer; free(defbuffer);
 
 		FLCLUSTERpref.get("tooltips", i, tooltips);
 		tooltips = i;

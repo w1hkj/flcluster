@@ -107,9 +107,7 @@ extern Fl_Group *tabIOconfig;
 extern Fl_Check_Button *btn_connect_to_fldigi;
 extern Fl_Input *inp_fldigi_address;
 extern Fl_Input *inp_fldigi_port;
-extern Fl_Check_Button *btn_connect_to_flrig;
-extern Fl_Input *inp_flrig_address;
-extern Fl_Input *inp_flrig_port;
+extern Fl_Box *lbl_fldigi_connected;
 #include <FL/Fl_Counter.H>
 extern Fl_Counter *intPSKsweetspot;
 extern Fl_Check_Button *btn_PSK_on_USB;
@@ -119,7 +117,10 @@ extern Fl_Check_Button *btn_cw_mode_is_LSB;
 extern Fl_Check_Button *btn_cw_mode_is_CW;
 extern Fl_Check_Button *btn_rtty_is_mark;
 extern Fl_Counter *intRTTYsweetspot;
-extern Fl_Box *lbl_fldigi_connected;
+extern Fl_Input *serversURL;
+extern Fl_Input *AR_help_URL;
+extern Fl_Input *CC_help_URL;
+extern Fl_Input *DX_help_URL;
 extern Fl_Group *gp_resize_io;
 extern Fl_Group *tabUserConfig;
 extern Fl_Input *inp_myCall;
@@ -160,4 +161,5 @@ extern unsigned char menu__i18n_done;
 extern Fl_Menu_Item menu_[];
 #define mnuFile (menu_+0)
 #define mnuExit (menu_+1)
+#define mnu_help (menu_+3)
 #endif

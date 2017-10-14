@@ -169,9 +169,6 @@ EXTRA_DIST = \
 	dxcluster/CCC_Commands.cxx \
 	dxcluster/DXClusterServers.cxx \
 	dxcluster/DXSpiderCommandReference.cxx \
-	dxcluster/arc-help.html \
-	dxcluster/CCC_Commands.html \
-	dxcluster/DXClusterServers.html \
 	dxcluster/dx_dialog.fl \
 	dxcluster/DXSpiderCommandReference.html \
 	include/ascii.h \
