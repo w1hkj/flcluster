@@ -1,8 +1,13 @@
 
 
-=Version 1.0.2=
+=Version 1.0.3=
 
-2017-10-12  David Freese  <w1hkj@bellsouth.net>
+2017-10-14  David Freese  <w1hkj@bellsouth.net>
+
+	0d1ba30: dxcc server list
+
+
+=Version 1.0.2=
 
 	efe4c58: UI thread bug
 	cc846da: FreeBSD reported bugs
