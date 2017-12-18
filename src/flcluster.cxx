@@ -314,7 +314,7 @@ int main(int argc, char *argv[])
 	}
 
 	Fl::lock();
-//	Fl::scheme("gtk+");
+	Fl::scheme("gtk+");
 
 	checkdirectories();
 

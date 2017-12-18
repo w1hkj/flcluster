@@ -625,7 +625,11 @@ progStatus.DX_Color_B = b;
 StreamText->color(fl_rgb_color(r,g,b));
 StreamText->redraw();
 
-brws_tcpip_stream->color(fl_rgb_color(r,g,b));
+brws_tcpip_stream->color(
+	StreamText->color(),
+	fl_contrast(progStatus.DXfontcolor, StreamText->color()));
+
+
 brws_tcpip_stream->redraw();
 
 brws_dxcluster_hosts->color(fl_rgb_color(
@@ -653,10 +657,19 @@ Fl_Button *btnDXfont=(Fl_Button *)0;
 
 static void cb_btnDXfont(Fl_Button*, void*) {
   font_browser->fontNumber(progStatus.DXfontnbr);
-    font_browser->fontSize(progStatus.DXfontsize);
-    font_browser->fontColor(progStatus.DXfontcolor);
-    font_browser->fontFilter(Font_Browser::FIXED_WIDTH);
-    font_browser->callback(cbDX_FontBrowser);
+
+font_browser->fontSize(progStatus.DXfontsize);
+
+font_browser->fontColor(progStatus.DXfontcolor);
+
+font_browser->fontFilter(Font_Browser::FIXED_WIDTH);
+
+font_browser->callback(cbDX_FontBrowser);
+
+brws_tcpip_stream->color(
+	StreamText->color(),
+	fl_contrast(progStatus.DXfontcolor, StreamText->color()));
+
 font_browser->show();
 }
 
@@ -669,6 +682,7 @@ o->labelcolor(progStatus.DXalt_color);
 o->redraw_label();
 
 brws_tcpip_stream->setFontColor(progStatus.DXalt_color, FTextBase::XMIT);
+
 brws_tcpip_stream->redraw();
 }
 
@@ -904,7 +918,6 @@ Fl_Double_Window* dxc_window() {
     } // Fl_Group* btn_select_host
     { Fl_Tabs* o = cluster_tabs = new Fl_Tabs(0, 78, 680, 340);
       { Fl_Group* o = tabDXclusterTelNetStream = new Fl_Group(0, 100, 680, 314, _("TelNet stream"));
-        tabDXclusterTelNetStream->hide();
         { Fl_Group* o = gp_resize_telnet = new Fl_Group(2, 102, 676, 276);
           gp_resize_telnet->box(FL_ENGRAVED_FRAME);
           { brws_tcpip_stream = new FTextView(4, 105, 668, 240);
@@ -1030,6 +1043,7 @@ Fl_Double_Window* dxc_window() {
       } // Fl_Group* tabDXclusterReports
       { Fl_Group* o = tabDXclusterConfig = new Fl_Group(0, 100, 680, 314, _("Cluster Config"));
         tabDXclusterConfig->tooltip(_("Initialization strings for telnet cluster host"));
+        tabDXclusterConfig->hide();
         { cc_resize_1 = new Fl_Group(0, 102, 676, 130);
           { Fl_Group* o = new Fl_Group(1, 102, 348, 126);
             { Fl_Browser* o = brws_dxcluster_hosts = new Fl_Browser(4, 121, 278, 100, _("Hosts"));

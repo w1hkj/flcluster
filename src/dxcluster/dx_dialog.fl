@@ -102,11 +102,11 @@ Function {dxc_window()} {open
   code {font_browser = new Font_Browser;} {}
   Fl_Window {} {
     label {DX Cluster Spotting} open
-    xywh {891 28 680 420} type Double resizable
+    xywh {891 45 680 420} type Double resizable
     code0 {o->resizable(cluster_tabs);}
     code1 {o->size_range(680,420,0,0);} visible
   } {
-    Fl_Menu_Bar {} {open selected
+    Fl_Menu_Bar {} {open
       xywh {0 0 680 22}
     } {
       Submenu mnuFile {
@@ -199,8 +199,8 @@ progStatus.changed = true;}
       code0 {o->resizable(tabDXclusterReports);}
     } {
       Fl_Group tabDXclusterTelNetStream {
-        label {TelNet stream}
-        xywh {0 100 680 314} hide
+        label {TelNet stream} selected
+        xywh {0 100 680 314}
         code0 {o->resizable(gp_resize_telnet);}
       } {
         Fl_Group gp_resize_telnet {open
@@ -328,7 +328,7 @@ dxc_column_widths();}
       }
       Fl_Group tabDXclusterConfig {
         label {Cluster Config} open
-        tooltip {Initialization strings for telnet cluster host} xywh {0 100 680 314}
+        tooltip {Initialization strings for telnet cluster host} xywh {0 100 680 314} hide
         code0 {o->resizable(cc_resize_1);}
       } {
         Fl_Group cc_resize_1 {open
@@ -835,7 +835,11 @@ progStatus.DX_Color_B = b;
 StreamText->color(fl_rgb_color(r,g,b));
 StreamText->redraw();
 
-brws_tcpip_stream->color(fl_rgb_color(r,g,b));
+brws_tcpip_stream->color(
+	StreamText->color(),
+	fl_contrast(progStatus.DXfontcolor, StreamText->color()));
+
+
 brws_tcpip_stream->redraw();
 
 brws_dxcluster_hosts->color(fl_rgb_color(
@@ -862,10 +866,19 @@ dxcluster_hosts_load();}
           Fl_Button btnDXfont {
             label Font
             callback {font_browser->fontNumber(progStatus.DXfontnbr);
-    font_browser->fontSize(progStatus.DXfontsize);
-    font_browser->fontColor(progStatus.DXfontcolor);
-    font_browser->fontFilter(Font_Browser::FIXED_WIDTH);
-    font_browser->callback(cbDX_FontBrowser);
+
+font_browser->fontSize(progStatus.DXfontsize);
+
+font_browser->fontColor(progStatus.DXfontcolor);
+
+font_browser->fontFilter(Font_Browser::FIXED_WIDTH);
+
+font_browser->callback(cbDX_FontBrowser);
+
+brws_tcpip_stream->color(
+	StreamText->color(),
+	fl_contrast(progStatus.DXfontcolor, StreamText->color()));
+
 font_browser->show();}
             xywh {305 363 86 25}
           }
@@ -877,6 +890,7 @@ o->labelcolor(progStatus.DXalt_color);
 o->redraw_label();
 
 brws_tcpip_stream->setFontColor(progStatus.DXalt_color, FTextBase::XMIT);
+
 brws_tcpip_stream->redraw();}
             tooltip {Color for outgoing telnet text} xywh {397 362 86 25}
             code0 {o->labelcolor(progStatus.DXalt_color);}

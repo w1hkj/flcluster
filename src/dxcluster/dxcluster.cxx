@@ -1707,10 +1707,13 @@ void DXcluster_init(void)
 
 	dxc_colors_fonts();
 
-	brws_tcpip_stream->color(fl_rgb_color(
+	Fl_Color bkg = fl_rgb_color(
 		progStatus.DX_Color_R,
 		progStatus.DX_Color_G,
-		progStatus.DX_Color_B));
+		progStatus.DX_Color_B);
+		
+	brws_tcpip_stream->color(bkg);
+		
 	brws_tcpip_stream->setFont(progStatus.DXfontnbr);
 	brws_tcpip_stream->setFontSize(progStatus.DXfontsize);
 	brws_tcpip_stream->setFontColor(progStatus.DXfontcolor, FTextBase::RECV);
@@ -1721,6 +1724,10 @@ void DXcluster_init(void)
 				progStatus.DX_Color_G,
 				progStatus.DX_Color_B) ),
 		FTextBase::CTRL);
+
+	brws_tcpip_stream->selection_color(
+		fl_contrast(progStatus.DXfontcolor, bkg));
+
 
 	ed_telnet_cmds->color(fl_rgb_color(
 		progStatus.DX_Color_R,
