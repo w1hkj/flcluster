@@ -320,7 +320,6 @@ static string trim(string s)
 	while ( (p = s.find("\b")) != string::npos) s.erase(p,1);
 	while ((p = s.find("\r")) != string::npos) s.erase(p,1);
 	while ((p = s.find("\n")) != string::npos) s.erase(p,1);
-	while (s[0] == ' ') s.erase(0,1);
 
 	return s;
 }
