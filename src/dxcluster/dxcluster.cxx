@@ -1255,6 +1255,11 @@ void DXcluster_submit()
 	try {
 		guard_lock dxc_lock(&DXcluster_mutex);
 		string sendbuf = trim(inp_dxcluster_cmd->value());
+		size_t n = 0;
+		while (n < sendbuf.length()) {
+			if ((unsigned int)sendbuf[n] > 0x7F) sendbuf.erase(n,1);
+			else ++n;
+		}
 		string test = ucasestr(sendbuf);
 		if (test.find("BYE") != string::npos) {
 			fl_alert2("Uncheck the \"Connect\" button to disconnect!");
