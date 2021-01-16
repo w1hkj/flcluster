@@ -1,8 +1,14 @@
 
 
-=Version 1.0.4=
+=Version 1.0.5=
 
-2017-12-18  David Freese  <w1hkj@bellsouth.net>
+2021-01-16  David Freese  <w1hkj@bellsouth.net>
+
+	fc5031f: FLTK 1.4
+	f89289e: UTF-8 strings
+
+
+=Version 1.0.4=
 
 	3fdf12c: Cluster stream
 	d32b3d9: AR report
