@@ -13,7 +13,7 @@ AC_DEFUN([AC_CHECK_FLTK], [
       if test "$FLTK_CONFIG" = "no"; then
           AC_MSG_ERROR([
   *** The fltk-config script could not be found. Please install the development
-  *** headers and libraries for FLTK 1.1.x, or set PATH to the directory that
+  *** headers and libraries for FLTK, or set PATH to the directory that
   *** contains fltk-config.
           ])
       fi
@@ -23,6 +23,9 @@ AC_DEFUN([AC_CHECK_FLTK], [
           AC_MSG_ERROR([$FLTK_CONFIG failed])
       fi
       if test "x$FLTK_API_VERSION" = "x1.3"; then
+          HAVE_FLTK_API_VERSION=yes
+      fi
+      if test "x$FLTK_API_VERSION" = "x1.4"; then
           HAVE_FLTK_API_VERSION=yes
       fi
 
@@ -38,11 +41,8 @@ AC_DEFUN([AC_CHECK_FLTK], [
       if test "${HAVE_FLTK_API_VERSION}" = "no"; then
           AC_MSG_ERROR([
   *** The version of FLTK found on your system provides API version $FLTK_API_VERSION.
-  *** To build $PACKAGE you need a FLTK version that provides API 1.3.
+  *** To build $PACKAGE you need a FLTK version that provides API 1.3.x or API 1.4.x
           ])
-      fi
-      if test $FLCLUSTER_FLTK_API_MINOR -gt 3; then
-          AC_MSG_WARN([$PACKAGE_TARNAME may not work with FLTK $FLTK_API_VERSION])
       fi
 
       FLTK_CFLAGS=`$FLTK_CONFIG --cxxflags`
