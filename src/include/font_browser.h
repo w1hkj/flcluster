@@ -58,7 +58,7 @@ public:
     enum filter_t { FIXED_WIDTH, VARIABLE_WIDTH, ALL_TYPES };
 
 private:
-    int		numfonts;
+    size_t	numfonts;
     Fl_Font	fontnbr;
     int		fontsize;
     Fl_Color	fontcolor;

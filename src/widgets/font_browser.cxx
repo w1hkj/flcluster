@@ -99,18 +99,19 @@ void Font_Browser::FontNameSelect()
 
 	// get sizes and fill browser; skip first element if it is zero
 	lst_Size->clear();
-	int nsizes, *sizes;
+	size_t nsizes;
+	int *sizes;
 	char buf[4];
 	nsizes = Fl::get_font_sizes(fontnbr, sizes);
 	//
-	for (int i = !*sizes; i < nsizes; i++)
+	for (size_t i = !*sizes; i < nsizes; i++)
 		if ((size_t)snprintf(buf, sizeof(buf), "%d", sizes[i]) < sizeof(buf))
-			lst_Size->add(buf, (void*)sizes[i]);
+			lst_Size->add(buf, (void*)&sizes[i]);
 
 	// scalable font with no suggested sizes
 	if (!lst_Size->size()) {
-		for (int i = 1; i <= 48; i++) {
-			snprintf(buf, sizeof(buf), "%d", i);
+		for (size_t i = 1; i <= 48; i++) {
+			snprintf(buf, sizeof(buf), "%zu", i);
 			lst_Size->add(buf, (void*)i);
 		}
 	}
@@ -166,7 +167,7 @@ Font_Browser::Font_Browser(int x, int y, int w, int h, const char *lbl )
 	numfonts =   Fl::set_fonts(0); // Nr of fonts available on the server
 
 	const char* name;
-	for(int i = 0; i < numfonts; i++) {
+	for(size_t i = 0; i < numfonts; i++) {
 		name = Fl::get_font_name((Fl_Font)i);
 		if (isalpha(*name))
 			lst_Font->add(name, (void *)i);

@@ -446,7 +446,7 @@ void dxc_column_widths()
 
 void dxc_colors_fonts()
 {
-	char hdr[200];
+	char hdr[350];
 
 	dxc_column_widths();
 
