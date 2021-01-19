@@ -31,9 +31,9 @@
 #endif
 
 #ifdef __APPLE__
-#	if __DARWIN_C_LEVEL < 199309L
+//#	if __DARWIN_C_LEVEL < 199309L
 #		if!HAVE_CLOCK_GETTIME
-//  enum clockid_t { CLOCK_REALTIME, CLOCK_MONOTONIC };
+//enum clockid_t { CLOCK_REALTIME, CLOCK_MONOTONIC };
 #			ifndef __clockid_t_defined
 				typedef int clockid_t;
 				#define __clockid_t_defined 1
@@ -50,7 +50,7 @@
 int clock_gettime(clockid_t clock_id, struct timespec* tp);
 #		endif /* !HAVE_CLOCK_GETTIME */
 
-#	endif /* __DARWIN_C_LEVEL */
+//#	endif /* __DARWIN_C_LEVEL */
 
 #else
 
