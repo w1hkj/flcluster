@@ -637,9 +637,12 @@ void parse_dxline(string dxbuffer)
 	dxc.comment = dxbuffer;
 
 	while (dxc.comment[0] == ' ') dxc.comment.erase(0,1);
-	while (dxc.comment[dxc.comment.length()-1] == ' ')
+	while (dxc.comment.length() && (dxc.comment[dxc.comment.length()-1] == ' '))
 		dxc.comment.erase(dxc.comment.length() - 1);
+
 	size_t n = dxc.comment.length();
+	if (n < 2) return;
+
 	if (n == 2) dxc.comment.insert(0,34, ' ');
 	else if (n > 3) {
 		if ((dxc.comment[n-3] == ' ') && (isalpha(dxc.comment[n-2])) &&
