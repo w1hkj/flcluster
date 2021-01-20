@@ -1,9 +1,16 @@
 
 
+=Version 1.0.6=
+
+2021-01-19  David Freese  <w1hkj@bellsouth.net>
+
+	19ec47c: Apple define
+	eac7729: Parse Dx Line failure
+
+
 =Version 1.0.5=
 
-2021-01-16  David Freese  <w1hkj@bellsouth.net>
-
+	415992a: warnings
 	fc5031f: FLTK 1.4
 	f89289e: UTF-8 strings
 
