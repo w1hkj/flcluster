@@ -108,7 +108,7 @@ name=$(echo "$PACKAGE_TARNAME" | upcase1)
 signature="$(echo $PACKAGE_TARNAME | sed 's/[aeiouAEIOU]//g; s/\(^....\).*/\1/')"
 binary="$PACKAGE_TARNAME"
 icon="$flcluster_icon"
-version="${FLCLUSTER_VERSION_MAJOR}.${FLCLUSTER_VERSION_MINOR}"
+version="${FLCLUSTER_VERSION_MAJOR}.${FLCLUSTER_VERSION_MINOR}${FLCUSTER_VERSION_PATCH}"
 appversion="$FLCLUSTER_VERSION"
 
 bundle
