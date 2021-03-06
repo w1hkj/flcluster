@@ -112,7 +112,6 @@ endif
 
 INSTALLER_FILE = flcluster-$(flcluster_VERSION)_setup.exe
 APPBUNDLE=flcluster-$(flcluster_VERSION)
-APPBUNDLE_NOLIBS=$(APPBUNDLE)-nolibs
 
 if HAVE_NSIS
 nsisinst: $(bin_PROGRAMS)
@@ -123,7 +122,7 @@ endif
 if DARWIN
 appbundle: $(bin_PROGRAMS)
 	sh ../scripts/mkappbundle.sh "../data" .
-    CLEAN_LOCAL += $(APPBUNDLE_NOLIBS) $(APPBUNDLE) $(APPBUNDLE)*.dmg
+    CLEAN_LOCAL += $(APPBUNDLE) $(APPBUNDLE)*.dmg
 endif
 
 clean-local:

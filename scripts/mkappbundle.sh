@@ -17,8 +17,8 @@ fi
 PWD=`pwd`
 data="${PWD}/$1"
 build="${PWD}/$2"
-bundle_dir="$APPBUNDLE_NOLIBS"
-static_bundle_dir="$APPBUNDLE"
+bundle_dir="$APPBUNDLE"
+
 # more sanity checks
 for d in "$data" "$build"; do
     test -d "$d" && continue
@@ -38,7 +38,6 @@ for f in "$plist" "$flcluster_icon"; do
     exit 1
 done
 
-# aaaaaaaaaargh => Aaaaaaaaaargh
 upcase1()
 {
     sed 'h; s/\(^.\).*/\1/; y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/; G; s/\n.//'
@@ -74,7 +73,11 @@ function bundle()
 
     # bundle the binary
     echo "creating ${build}/$bundle_dir/$appname"
-    $mkinstalldirs "$bundle_dir/$appname/Contents/MacOS" "$bundle_dir/$appname/Contents/Resources"
+
+    $mkinstalldirs "$bundle_dir/$appname/Contents/MacOS" \
+                   "$bundle_dir/$appname/Contents/Resources" \
+                   "$bundle_dir/$appname/Contents/Frameworks"
+
     cd "$bundle_dir"
     $INSTALL_PROGRAM "${build}/$binary" "$appname/Contents/MacOS"
     test "x$NOSTRIP" = "x" && ${STRIP:-strip} -S "$appname/Contents/MacOS/$binary"
@@ -89,14 +92,9 @@ function bundle()
 	exit 1
     fi
 
-
-    # bundle the binary and its non-standard dependencies
-    echo "creating ${build}/$static_bundle_dir/$appname"
+    # bundle the non-standard dependencies
     cd ..
-    $mkinstalldirs "$static_bundle_dir"
-    cp -pR "$bundle_dir/$appname" "$static_bundle_dir"
-    $mkinstalldirs "$static_bundle_dir/$appname/Contents/Frameworks"
-    cd "$static_bundle_dir/$appname/Contents"
+    cd "$bundle_dir/$appname/Contents"
     copy_libs "MacOS/$binary"
 }
 
@@ -115,6 +113,4 @@ bundle
 
 cd "$build"
 echo $ECHO_N "creating disk image"
-hdiutil create -ov -srcfolder "$bundle_dir" -format UDZO -tgtimagekey zlib-level=9 "${APPBUNDLE}-nolibs.dmg"
-echo $ECHO_N "creating disk image"
-hdiutil create -ov -srcfolder "$static_bundle_dir" -format UDZO -tgtimagekey zlib-level=9 "${APPBUNDLE}.dmg"
+hdiutil create -ov -srcfolder "$bundle_dir" -format UDZO -tgtimagekey zlib-level=9 "${APPBUNDLE}.dmg"
