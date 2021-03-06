@@ -1258,6 +1258,7 @@ void DXcluster_submit()
 	try {
 		guard_lock dxc_lock(&DXcluster_mutex);
 		string sendbuf = trim(inp_dxcluster_cmd->value());
+		if (sendbuf[0] == '!') sendbuf.erase(0,1);
 		size_t n = 0;
 		while (n < sendbuf.length()) {
 			if ((unsigned int)sendbuf[n] > 0x7F) sendbuf.erase(n,1);
@@ -2073,39 +2074,47 @@ void dxcluster_servers(Fl_Button*, void*)
 void dxc_click_m1(Fl_Button*, void*)
 {
 	inp_dxcluster_cmd->value(progStatus.dxcm_text_1.c_str());
+	if (progStatus.dxcm_text_1[0] == '!') DXcluster_submit();
 }
 
 void dxc_click_m2(Fl_Button*, void*)
 {
 	inp_dxcluster_cmd->value(progStatus.dxcm_text_2.c_str());
+	if (progStatus.dxcm_text_2[0] == '!') DXcluster_submit();
 }
 
 void dxc_click_m3(Fl_Button*, void*)
 {
 	inp_dxcluster_cmd->value(progStatus.dxcm_text_3.c_str());
+	if (progStatus.dxcm_text_3[0] == '!') DXcluster_submit();
 }
 
 void dxc_click_m4(Fl_Button*, void*)
 {
 	inp_dxcluster_cmd->value(progStatus.dxcm_text_4.c_str());
+	if (progStatus.dxcm_text_4[0] == '!') DXcluster_submit();
 }
 
 void dxc_click_m5(Fl_Button*, void*)
 {
 	inp_dxcluster_cmd->value(progStatus.dxcm_text_5.c_str());
+	if (progStatus.dxcm_text_5[0] == '!') DXcluster_submit();
 }
 
 void dxc_click_m6(Fl_Button*, void*)
 {
 	inp_dxcluster_cmd->value(progStatus.dxcm_text_6.c_str());
+	if (progStatus.dxcm_text_6[0] == '!') DXcluster_submit();
 }
 
 void dxc_click_m7(Fl_Button*, void*)
 {
 	inp_dxcluster_cmd->value(progStatus.dxcm_text_7.c_str());
+	if (progStatus.dxcm_text_7[0] == '!') DXcluster_submit();
 }
 
 void dxc_click_m8(Fl_Button*, void*)
 {
 	inp_dxcluster_cmd->value(progStatus.dxcm_text_8.c_str());
+	if (progStatus.dxcm_text_8[0] == '!') DXcluster_submit();
 }
