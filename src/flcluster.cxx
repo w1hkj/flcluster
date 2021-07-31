@@ -87,6 +87,8 @@ static const char *copyright[] = {
 #include <FL/Fl_Pixmap.H>
 #include <FL/Fl_Image.H>
 
+#include "XmlRpcClient.h"
+
 using namespace std;
 
 Fl_Double_Window *main_window = (Fl_Double_Window *)0;
@@ -306,8 +308,17 @@ void cb_Exit()
  *
  ***********************************************************/
 
-int main(int argc, char *argv[])
+static std::string pname = "";
+
+int main (int argc, char *argv[])
 {
+	pname = argv[0];
+	size_t pn = pname.rfind("/");
+	if (pn != std::string::npos) pname.erase(0, pn + 1);
+	pn = pname.rfind("\\");
+	if (pn != std::string::npos) pname.erase(0, pn + 1);
+	XmlRpc::set_pname(pname);
+
 	int arg_idx;
 	if (Fl::args(argc, argv, arg_idx, parse_args) != argc) {
 		return 0;

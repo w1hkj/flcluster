@@ -112,7 +112,7 @@ fi
 # set HAVE_ASCIIDOC Makefile conditional
 #AC_FLCLUSTER_DOCS
 
-AC_FLCLUSTER_PKG_CHECK([flxmlrpc], [flxmlrpc >= 0.1.0],
+AC_FLCLUSTER_PKG_CHECK([flxmlrpc], [flxmlrpc >= 1.0.0],
   [yes], [yes], [use external flxmlrpc library @<:@autodetect@:>@],
   [ENABLE_FLXMLRPC])
 
