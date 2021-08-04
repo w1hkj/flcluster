@@ -1,48 +1,36 @@
+2021-08-04  dave-w1hkj  <w1hkj@bellsouth.net>
 
+	91fa2a3: Version 1.0.7
+	49d251b: Xmlrpc Client ID
+	2c2cfb7: openSUSE Tumbleweed
+	554952f: Scripts
+	8cf0813: Immediate cmd
 
-=Version 1.0.6=
+2021-02-07  David Freese  <w1hkj@bellsouth.net>
 
-2021-01-19  David Freese  <w1hkj@bellsouth.net>
-
+	bc942df: macOS Info.plist
+	26cb3e1: Version 1.0.6
 	19ec47c: Apple define
 	eac7729: Parse Dx Line failure
-
-
-=Version 1.0.5=
-
+	136f9bb: Version 1.0.5
 	415992a: warnings
 	fc5031f: FLTK 1.4
 	f89289e: UTF-8 strings
-
-
-=Version 1.0.4=
-
+	afc8e12: Version 1.0.4
 	3fdf12c: Cluster stream
 	d32b3d9: AR report
-
-
-=Version 1.0.3=
-
+	e2c2391: Version 1.0.3
 	0d1ba30: dxcc server list
-
-
-=Version 1.0.2=
-
+	205789f: Version 1.0.2
 	efe4c58: UI thread bug
 	cc846da: FreeBSD reported bugs
 	be720c4: Prog doc update
-
-
-=Version 1.0.1=
-
+	a3551b1: Version 1.0.1
 	d46e018: Application icon
 	926b7fd: Installation bugs
 	43e4059: win mingw
 	4a092db: doc update
 	c9021c0: Code revision #2
-
-
-=Version 1.0.0=
-
+	8f41b96: Version 1.0.0
 	c5373f2: Code Revision 1
 	926ee8e: Initial flcluster repository
