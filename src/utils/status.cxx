@@ -66,6 +66,14 @@ status progStatus = {
 	"",				// std::string dxcm_label_6;
 	"",				// std::string dxcm_label_7;
 	"",				// std::string dxcm_label_8;
+	"",				// std::string dxcm_label_9;
+	"",				// std::string dxcm_label_10;
+	"",				// std::string dxcm_label_11;
+	"",				// std::string dxcm_label_12;
+	"",				// std::string dxcm_label_13;
+	"",				// std::string dxcm_label_14;
+	"",				// std::string dxcm_label_15;
+	"",				// std::string dxcm_label_16;
 
 	"",				// std::string dxcm_text_1;
 	"",				// std::string dxcm_text_2;
@@ -75,6 +83,14 @@ status progStatus = {
 	"",				// std::string dxcm_text_6;
 	"",				// std::string dxcm_text_7;
 	"",				// std::string dxcm_text_8;
+	"",				// std::string dxcm_text_9;
+	"",				// std::string dxcm_text_10;
+	"",				// std::string dxcm_text_11;
+	"",				// std::string dxcm_text_12;
+	"",				// std::string dxcm_text_13;
+	"",				// std::string dxcm_text_14;
+	"",				// std::string dxcm_text_15;
+	"",				// std::string dxcm_text_16;
 
 	5,				// bool keepalive;
 
@@ -165,6 +181,14 @@ void status::saveLastState()
 	FLCLUSTERpref.set("dxcm_label_6", dxcm_label_6.c_str());
 	FLCLUSTERpref.set("dxcm_label_7", dxcm_label_7.c_str());
 	FLCLUSTERpref.set("dxcm_label_8", dxcm_label_8.c_str());
+	FLCLUSTERpref.set("dxcm_label_9", dxcm_label_9.c_str());
+	FLCLUSTERpref.set("dxcm_label_10", dxcm_label_10.c_str());
+	FLCLUSTERpref.set("dxcm_label_11", dxcm_label_11.c_str());
+	FLCLUSTERpref.set("dxcm_label_12", dxcm_label_12.c_str());
+	FLCLUSTERpref.set("dxcm_label_13", dxcm_label_13.c_str());
+	FLCLUSTERpref.set("dxcm_label_14", dxcm_label_14.c_str());
+	FLCLUSTERpref.set("dxcm_label_15", dxcm_label_15.c_str());
+	FLCLUSTERpref.set("dxcm_label_16", dxcm_label_16.c_str());
 
 	FLCLUSTERpref.set("dxcm_text_1", dxcm_text_1.c_str());
 	FLCLUSTERpref.set("dxcm_text_2", dxcm_text_2.c_str());
@@ -174,6 +198,14 @@ void status::saveLastState()
 	FLCLUSTERpref.set("dxcm_text_6", dxcm_text_6.c_str());
 	FLCLUSTERpref.set("dxcm_text_7", dxcm_text_7.c_str());
 	FLCLUSTERpref.set("dxcm_text_8", dxcm_text_8.c_str());
+	FLCLUSTERpref.set("dxcm_text_9", dxcm_text_9.c_str());
+	FLCLUSTERpref.set("dxcm_text_10", dxcm_text_10.c_str());
+	FLCLUSTERpref.set("dxcm_text_11", dxcm_text_11.c_str());
+	FLCLUSTERpref.set("dxcm_text_12", dxcm_text_12.c_str());
+	FLCLUSTERpref.set("dxcm_text_13", dxcm_text_13.c_str());
+	FLCLUSTERpref.set("dxcm_text_14", dxcm_text_14.c_str());
+	FLCLUSTERpref.set("dxcm_text_15", dxcm_text_15.c_str());
+	FLCLUSTERpref.set("dxcm_text_16", dxcm_text_16.c_str());
 
 	FLCLUSTERpref.set("keepalive", keepalive);
 
@@ -292,6 +324,30 @@ void status::loadLastState()
 		FLCLUSTERpref.get("dxcm_label_8", defbuffer, "");
 		dxcm_label_8 = defbuffer; free(defbuffer);
 
+		FLCLUSTERpref.get("dxcm_label_9", defbuffer, "");
+		dxcm_label_9 = defbuffer; free(defbuffer);
+
+		FLCLUSTERpref.get("dxcm_label_10", defbuffer, "");
+		dxcm_label_10 = defbuffer; free(defbuffer);
+
+		FLCLUSTERpref.get("dxcm_label_11", defbuffer, "");
+		dxcm_label_11 = defbuffer; free(defbuffer);
+
+		FLCLUSTERpref.get("dxcm_label_12", defbuffer, "");
+		dxcm_label_12 = defbuffer; free(defbuffer);
+
+		FLCLUSTERpref.get("dxcm_label_13", defbuffer, "");
+		dxcm_label_13 = defbuffer; free(defbuffer);
+
+		FLCLUSTERpref.get("dxcm_label_14", defbuffer, "");
+		dxcm_label_14 = defbuffer; free(defbuffer);
+
+		FLCLUSTERpref.get("dxcm_label_15", defbuffer, "");
+		dxcm_label_15 = defbuffer; free(defbuffer);
+
+		FLCLUSTERpref.get("dxcm_label_16", defbuffer, "");
+		dxcm_label_16 = defbuffer; free(defbuffer);
+
 		FLCLUSTERpref.get("dxcm_text_1", defbuffer, "");
 		dxcm_text_1 = defbuffer; free(defbuffer);
 
@@ -315,6 +371,30 @@ void status::loadLastState()
 
 		FLCLUSTERpref.get("dxcm_text_8", defbuffer, "");
 		dxcm_text_8 = defbuffer; free(defbuffer);
+
+		FLCLUSTERpref.get("dxcm_text_9", defbuffer, "");
+		dxcm_text_9 = defbuffer; free(defbuffer);
+
+		FLCLUSTERpref.get("dxcm_text_10", defbuffer, "");
+		dxcm_text_10 = defbuffer; free(defbuffer);
+
+		FLCLUSTERpref.get("dxcm_text_11", defbuffer, "");
+		dxcm_text_11 = defbuffer; free(defbuffer);
+
+		FLCLUSTERpref.get("dxcm_text_12", defbuffer, "");
+		dxcm_text_12 = defbuffer; free(defbuffer);
+
+		FLCLUSTERpref.get("dxcm_text_13", defbuffer, "");
+		dxcm_text_13 = defbuffer; free(defbuffer);
+
+		FLCLUSTERpref.get("dxcm_text_14", defbuffer, "");
+		dxcm_text_14 = defbuffer; free(defbuffer);
+
+		FLCLUSTERpref.get("dxcm_text_15", defbuffer, "");
+		dxcm_text_15 = defbuffer; free(defbuffer);
+
+		FLCLUSTERpref.get("dxcm_text_16", defbuffer, "");
+		dxcm_text_16 = defbuffer; free(defbuffer);
 
 		int i = 0;
 

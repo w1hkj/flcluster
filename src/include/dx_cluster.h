@@ -74,6 +74,14 @@ extern void dxc_click_m5(Fl_Button*, void*);
 extern void dxc_click_m6(Fl_Button*, void*);
 extern void dxc_click_m7(Fl_Button*, void*);
 extern void dxc_click_m8(Fl_Button*, void*);
+extern void dxc_click_m9(Fl_Button*, void*);
+extern void dxc_click_m10(Fl_Button*, void*);
+extern void dxc_click_m11(Fl_Button*, void*);
+extern void dxc_click_m12(Fl_Button*, void*);
+extern void dxc_click_m13(Fl_Button*, void*);
+extern void dxc_click_m14(Fl_Button*, void*);
+extern void dxc_click_m15(Fl_Button*, void*);
+extern void dxc_click_m16(Fl_Button*, void*);
 
 extern void send_name();
 extern void send_qth();

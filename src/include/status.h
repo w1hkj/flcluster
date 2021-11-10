@@ -61,6 +61,14 @@ struct status {
 	std::string dxcm_label_6;
 	std::string dxcm_label_7;
 	std::string dxcm_label_8;
+	std::string dxcm_label_9;
+	std::string dxcm_label_10;
+	std::string dxcm_label_11;
+	std::string dxcm_label_12;
+	std::string dxcm_label_13;
+	std::string dxcm_label_14;
+	std::string dxcm_label_15;
+	std::string dxcm_label_16;
 
 	std::string dxcm_text_1;
 	std::string dxcm_text_2;
@@ -70,6 +78,14 @@ struct status {
 	std::string dxcm_text_6;
 	std::string dxcm_text_7;
 	std::string dxcm_text_8;
+	std::string dxcm_text_9;
+	std::string dxcm_text_10;
+	std::string dxcm_text_11;
+	std::string dxcm_text_12;
+	std::string dxcm_text_13;
+	std::string dxcm_text_14;
+	std::string dxcm_text_15;
+	std::string dxcm_text_16;
 
 	int keepalive;
 

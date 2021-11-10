@@ -2118,3 +2118,51 @@ void dxc_click_m8(Fl_Button*, void*)
 	inp_dxcluster_cmd->value(progStatus.dxcm_text_8.c_str());
 	if (progStatus.dxcm_text_8[0] == '!') DXcluster_submit();
 }
+
+void dxc_click_m9(Fl_Button*, void*)
+{
+	inp_dxcluster_cmd->value(progStatus.dxcm_text_9.c_str());
+	if (progStatus.dxcm_text_9[0] == '!') DXcluster_submit();
+}
+
+void dxc_click_m10(Fl_Button*, void*)
+{
+	inp_dxcluster_cmd->value(progStatus.dxcm_text_10.c_str());
+	if (progStatus.dxcm_text_10[0] == '!') DXcluster_submit();
+}
+
+void dxc_click_m11(Fl_Button*, void*)
+{
+	inp_dxcluster_cmd->value(progStatus.dxcm_text_11.c_str());
+	if (progStatus.dxcm_text_11[0] == '!') DXcluster_submit();
+}
+
+void dxc_click_m12(Fl_Button*, void*)
+{
+	inp_dxcluster_cmd->value(progStatus.dxcm_text_12.c_str());
+	if (progStatus.dxcm_text_12[0] == '!') DXcluster_submit();
+}
+
+void dxc_click_m13(Fl_Button*, void*)
+{
+	inp_dxcluster_cmd->value(progStatus.dxcm_text_13.c_str());
+	if (progStatus.dxcm_text_13[0] == '!') DXcluster_submit();
+}
+
+void dxc_click_m14(Fl_Button*, void*)
+{
+	inp_dxcluster_cmd->value(progStatus.dxcm_text_14.c_str());
+	if (progStatus.dxcm_text_14[0] == '!') DXcluster_submit();
+}
+
+void dxc_click_m15(Fl_Button*, void*)
+{
+	inp_dxcluster_cmd->value(progStatus.dxcm_text_15.c_str());
+	if (progStatus.dxcm_text_15[0] == '!') DXcluster_submit();
+}
+
+void dxc_click_m16(Fl_Button*, void*)
+{
+	inp_dxcluster_cmd->value(progStatus.dxcm_text_16.c_str());
+	if (progStatus.dxcm_text_16[0] == '!') DXcluster_submit();
+}
