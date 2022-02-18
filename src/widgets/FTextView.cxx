@@ -51,8 +51,6 @@
 
 #include "debug.h"
 
-using namespace std;
-
 
 /// FTextBase constructor.
 /// Word wrapping is enabled by default at column 80, but see \c reset_wrap_col.
@@ -311,7 +309,7 @@ int FTextBase::readFile(const char* fn)
 		while (fgets(buf, sizeof(buf), tfile)) {
 			newbuf = buf;
 			p = 0;
-			while ((p = newbuf.find('^',p)) != string::npos) {
+			while ((p = newbuf.find('^',p)) != std::string::npos) {
 				newbuf.insert(p, "^");
 				p += 2;
 			}
@@ -326,7 +324,7 @@ int FTextBase::readFile(const char* fn)
 		while (fgets(buf, sizeof(buf), tfile)) {
 			newbuf = buf;
 			p = 0;
-			while ((p = newbuf.find('^',p)) != string::npos) {
+			while ((p = newbuf.find('^',p)) != std::string::npos) {
 				newbuf.insert(p, "^");
 				p += 2;
 			}
@@ -353,7 +351,7 @@ void FTextBase::saveFile(void)
  	const char *fn = FSEL::saveas(_("Save text as"), "Text\t*.txt");
 	if (fn) {
 #ifdef __WOE32__
-		ofstream tfile(fn);
+		std::ofstream tfile(fn);
 		if (!tfile)
 			return;
 
@@ -377,7 +375,7 @@ void FTextBase::saveFile(void)
 	}
 }
 
-/// Returns a character string containing the selected word, if any,
+/// Returns a character std::string containing the selected word, if any,
 /// or the word at (\a x, \a y) relative to the widget's \c x() and \c y().
 /// If \a ontext is true, this function will return text only if the
 /// mouse cursor position is inside the text range.
@@ -399,7 +397,7 @@ char* FTextBase::get_word(int x, int y, const char* nwchars, bool ontext)
 			return tbuf->selection_text();
 	}
 
-	string nonword = nwchars;
+	std::string nonword = nwchars;
 	nonword.append(" \t\n");
 	if (!tbuf->findchars_backward(p, nonword.c_str(), &start))
 		start = 0;
@@ -794,8 +792,8 @@ int FTextEdit::handle_dnd_drop(void)
 	if (Fl::event_shift())
 		return FTextBase::handle(FL_PASTE);
 
-	string text;
-	string::size_type p, len;
+	std::string text;
+	std::string::size_type p, len;
 
 	text = Fl::event_text();
 
@@ -805,7 +803,7 @@ int FTextEdit::handle_dnd_drop(void)
 #endif
 
 	len = text.length();
-	while ((p = text.find(sep)) != string::npos) {
+	while ((p = text.find(sep)) != std::string::npos) {
 		text[p] = '\0';
 #if !defined(__APPLE__) && !defined(__WOE32__)
 		if (text.find("file://") == 0) {
@@ -816,22 +814,22 @@ int FTextEdit::handle_dnd_drop(void)
 #endif
 /*
 #ifndef BUILD_FLARQ
-	if ((text.find("jpg") != string::npos) ||
-		(text.find("JPG") != string::npos) ||
-		(text.find("jpeg") != string::npos) ||
-		(text.find("JPEG") != string::npos) ||
-		(text.find("png") != string::npos) ||
-		(text.find("PNG") != string::npos) ||
-		(text.find("bmp") != string::npos) ||
-		(text.find("BMP") != string::npos) ) {
+	if ((text.find("jpg") != std::string::npos) ||
+		(text.find("JPG") != std::string::npos) ||
+		(text.find("jpeg") != std::string::npos) ||
+		(text.find("JPEG") != std::string::npos) ||
+		(text.find("png") != std::string::npos) ||
+		(text.find("PNG") != std::string::npos) ||
+		(text.find("bmp") != std::string::npos) ||
+		(text.find("BMP") != std::string::npos) ) {
 
 		LOG_INFO("DnD image %s", text.c_str());
 
-		if ((p = text.find("file://")) != string::npos)
+		if ((p = text.find("file://")) != std::string::npos)
 			text.erase(0, p + strlen("file://"));
-		if ((p = text.find('\r')) != string::npos)
+		if ((p = text.find('\r')) != std::string::npos)
 			text.erase(p);
-		if ((p = text.find('\n')) != string::npos)
+		if ((p = text.find('\n')) != std::string::npos)
 			text.erase(p);
 		if (text[text.length()-1] == 0) text.erase(text.length() -1);
 		TxQueINSERTIMAGE(text);

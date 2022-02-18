@@ -88,25 +88,25 @@ extern void send_qth();
 extern void send_qra();
 
 struct dxinfo {
-	string freq;
-	string call;
-	string date;
-	string time;
-	string comment;
-	string spotter;
-	string call_country_code;
-	string spotter_country_code;
-	string originating_node;
-	string call_itu_zone;
-	string call_cq_zone;
-	string spotter_itu_zone;
-	string spotter_cq_zone;
-	string call_US_state;
-	string spotter_US_state;
-	string call_country_text;
-	string spotter_country_text;
-	string call_grid_square;
-	string spotter_grid_square;
+	std::string freq;
+	std::string call;
+	std::string date;
+	std::string time;
+	std::string comment;
+	std::string spotter;
+	std::string call_country_code;
+	std::string spotter_country_code;
+	std::string originating_node;
+	std::string call_itu_zone;
+	std::string call_cq_zone;
+	std::string spotter_itu_zone;
+	std::string spotter_cq_zone;
+	std::string call_US_state;
+	std::string spotter_US_state;
+	std::string call_country_text;
+	std::string spotter_country_text;
+	std::string call_grid_square;
+	std::string spotter_grid_square;
 
 	dxinfo() { clear(); } 
 	void clear() {

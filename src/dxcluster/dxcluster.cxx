@@ -55,8 +55,6 @@
 #include "dx_dialog.h"
 #include "dx_cluster.h"
 
-using namespace std;
-
 void abort_connection();
 void restart_connection(void *);
 
@@ -66,10 +64,10 @@ static char zdbuf[9] = "20120602";
 static char ztbuf[11] = "12:30:00 Z";
 
 /// write stream i/o to external text file 'dx_stream.txt'
-static void write_dxc_debug(char c, string txt)
+static void write_dxc_debug(char c, std::string txt)
 {
 	if (!dx_stream) return;
-	string pname = HOME_DIR;
+	std::string pname = HOME_DIR;
 	pname.append("dx_stream.txt");
 	FILE *dxcdebug = fl_fopen(pname.c_str(), "a");
 	fprintf(dxcdebug, "%s [%c]:%s", ztbuf, c, txt.c_str());
@@ -238,7 +236,7 @@ bool DXcluster_enabled = false;
 int  DXcluster_connect_timeout =
 	(DXCLUSTER_CONNECT_TIMEOUT) / (DXCLUSTER_SOCKET_TIMEOUT + DXCLUSTER_LOOP_TIME);
 
-void write_socket(string s)
+void write_socket(std::string s)
 {
 	try {
 		guard_lock write_lock(&DXcluster_write_mutex);
@@ -281,9 +279,9 @@ void dxc_label(void *)
 	lbl_dxc_connected->redraw();
 }
 
-string hexvals(string s)
+std::string hexvals(std::string s)
 {
-	static string sret;
+	static std::string sret;
 	static char hstr[8];
 	sret.clear();
 	snprintf(hstr, sizeof(hstr), "{%3d}\"", (int)s.length());
@@ -299,12 +297,12 @@ string hexvals(string s)
 	return sret;
 }
 
-static void write_raw(string s)
+static void write_raw(std::string s)
 {
 	return; // comment out for debugging raw text rcvd from server
 
-	string pname = HOME_DIR;
-	string hexstr;
+	std::string pname = HOME_DIR;
+	std::string hexstr;
 	hexstr.append("[").append(ztbuf).append("]").append(hexvals(s));
 	pname.append("raw.txt");
 	FILE *raw_text = fl_fopen(pname.c_str(), "a");
@@ -312,19 +310,19 @@ static void write_raw(string s)
 	fclose(raw_text);
 }
 
-static string trim(string s)
+static std::string trim(std::string s)
 {
 	size_t p;
 	while (s[s.length()-1] == ' ') s.erase(s.length()-1, 1);
-	while ( (p = s.find("\x07")) != string::npos) s.erase(p, 1);
-	while ( (p = s.find("\b")) != string::npos) s.erase(p,1);
-	while ((p = s.find("\r")) != string::npos) s.erase(p,1);
-	while ((p = s.find("\n")) != string::npos) s.erase(p,1);
+	while ( (p = s.find("\x07")) != std::string::npos) s.erase(p, 1);
+	while ( (p = s.find("\b")) != std::string::npos) s.erase(p,1);
+	while ((p = s.find("\r")) != std::string::npos) s.erase(p,1);
+	while ((p = s.find("\n")) != std::string::npos) s.erase(p,1);
 
 	return s;
 }
 
-static string ucasestr(string s)
+static std::string ucasestr(std::string s)
 {
 	for (size_t n = 0; n < s.length(); n++) s[n] = toupper(s[n]);
 	return s;
@@ -341,14 +339,14 @@ static string ucasestr(string s)
 //DX de W4LT:      14204.0  EA3HSO                                      2218Z EL88<BELL><BELL><cr><lf>
 //--------------------------------------------------------------------------------
 
-static string tcpip_buffer;
+static std::string tcpip_buffer;
 
-std::queue<string> brws_que;
+std::queue<std::string> brws_que;
 
 void update_brws_tcpip_stream(void *)
 {
 	guard_lock brws_lock(&brws_que_mutex);
-	static string s;
+	static std::string s;
 
 	while (!brws_que.empty()) {
 		s = brws_que.front();
@@ -359,10 +357,10 @@ void update_brws_tcpip_stream(void *)
 	brws_tcpip_stream->redraw();
 }
 
-void show_tx_stream(string buff)
+void show_tx_stream(std::string buff)
 {
 	size_t p;
-	while ((p = buff.find("\r")) != string::npos) buff.erase(p,1);
+	while ((p = buff.find("\r")) != std::string::npos) buff.erase(p,1);
 	if (buff[buff.length()-1] != '\n') buff += '\n';
 
 	guard_lock brws_lock(&brws_que_mutex);
@@ -372,7 +370,7 @@ void show_tx_stream(string buff)
 	write_dxc_debug('W', buff);
 }
 
-void show_rx_stream(string buff)
+void show_rx_stream(std::string buff)
 {
 	for (size_t p = 0; p < buff.length(); p++) {
 		if ( (buff[p] < '\n') ||
@@ -391,7 +389,7 @@ void show_rx_stream(string buff)
 	write_dxc_debug('R', buff);
 }
 
-void show_error(string buff)
+void show_error(std::string buff)
 {
 	if (buff.empty()) return;
 	if (!brws_tcpip_stream) return;
@@ -479,8 +477,8 @@ void dxc_lines()
 
 	if (n == 0) return;
 
-	queue<string> lines;
-	string dxc_line;
+	std::queue<std::string> lines;
+	std::string dxc_line;
 
 	size_t p;
 	for (int i = 0; i < n; i++) {
@@ -489,10 +487,10 @@ void dxc_lines()
 		else
 			dxc_line = brws_dx_cluster->text(n - i);
 
-		while ((p = dxc_line.find(even)) != string::npos)
+		while ((p = dxc_line.find(even)) != std::string::npos)
 			dxc_line.erase(p, strlen(even));
 
-		while ((p = dxc_line.find(odd)) != string::npos)
+		while ((p = dxc_line.find(odd)) != std::string::npos)
 			dxc_line.erase(p, strlen(odd));
 
 		lines.push(dxc_line);
@@ -507,14 +505,14 @@ void dxc_lines()
 		if (i % 2) {
 			dxc_line.insert(0, even);
 			p = 0;
-			while ((p = dxc_line.find("^", p)) != string::npos) {
+			while ((p = dxc_line.find("^", p)) != std::string::npos) {
 				dxc_line.insert(p+1, even);
 				p += strlen(even);
 			}
 		} else {
 			dxc_line.insert(0, odd);
 			p = 0;
-			while ((p = dxc_line.find("^", p)) != string::npos) {
+			while ((p = dxc_line.find("^", p)) != std::string::npos) {
 				dxc_line.insert(p+1, odd);
 				p += strlen(odd);
 			}
@@ -552,13 +550,13 @@ DX de VE9CB:     14016.0  NP4R         CQ DX                       PR 0003Z
 DX de W7FW:       7009.1  LU1YT        tnx Carlos                    2355Z IL
 ================================================================================*/
 
-std::queue<string> dxclines;
+std::queue<std::string> dxclines;
 
 void update_brws_dx_cluster(void *)
 {
 	guard_lock dxcc_lock(&dxc_line_mutex);
 
-	string dxc_line;
+	std::string dxc_line;
 
 	dxc_colors_fonts();
 
@@ -566,18 +564,18 @@ void update_brws_dx_cluster(void *)
 		dxc_line = dxclines.front();
 		dxclines.pop();
 
-		size_t p = string::npos;
+		size_t p = std::string::npos;
 		if (brws_dx_cluster->size() % 2) {
 			dxc_line.insert(0, even);
 			p = 0;
-			while ((p = dxc_line.find("^", p)) != string::npos) {
+			while ((p = dxc_line.find("^", p)) != std::string::npos) {
 				dxc_line.insert(p+1, even);
 				p += strlen(even);
 			}
 		} else {
 			dxc_line.insert(0, odd);
 			p = 0;
-			while ((p = dxc_line.find("^", p)) != string::npos) {
+			while ((p = dxc_line.find("^", p)) != std::string::npos) {
 				dxc_line.insert(p+1, odd);
 				p += strlen(odd);
 			}
@@ -595,7 +593,7 @@ void update_brws_dx_cluster(void *)
 	}
 }
 
-void parse_dxline(string dxbuffer)
+void parse_dxline(std::string dxbuffer)
 {
 	guard_lock dxcc_lock(&dxc_line_mutex);
 
@@ -603,7 +601,7 @@ void parse_dxline(string dxbuffer)
 
 	dxbuffer.erase(0, strlen("DX de "));
 	size_t p = dxbuffer.find(":");
-	if (p == string::npos || p > 16) 
+	if (p == std::string::npos || p > 16) 
 		p = dxbuffer.find(" ");
 
 	dxc.spotter = dxbuffer.substr(0,p);
@@ -619,7 +617,7 @@ void parse_dxline(string dxbuffer)
 	dxc.call = dxbuffer.substr(0,p);
 	dxbuffer.erase(0, p+1);
 
-	string tzulu;
+	std::string tzulu;
 	p = 0;
 	while (p < dxbuffer.length() - 4) {
 		if (isdigit(dxbuffer[p]) &&
@@ -651,7 +649,7 @@ void parse_dxline(string dxbuffer)
 		}
 	}
 
-	string spot;
+	std::string spot;
 	spot.assign("@.").append(dxc.spotter);
 	spot.append("^@r@.").append(dxc.freq);
 	spot.append("^@.").append(dxc.call);
@@ -664,7 +662,7 @@ void parse_dxline(string dxbuffer)
 	Fl::awake(update_brws_dx_cluster);
 }
 
-void parse_cc11_line(string buffer)
+void parse_cc11_line(std::string buffer)
 {
 
 //If you do a set/ve7cc command on connection startup, you will get this
@@ -718,7 +716,7 @@ void parse_cc11_line(string buffer)
 	buffer.erase(0, p+1); p = buffer.find("^"); dxcc.call_grid_square = buffer.substr(0,p);
 	buffer.erase(0, p+1); dxcc.spotter_grid_square = buffer;
 
-	string spot;
+	std::string spot;
 	spot.assign("@.").append(dxcc.spotter);
 	spot.append("^@r@.").append(dxcc.freq);
 	spot.append("^@.").append(dxcc.call);
@@ -750,7 +748,7 @@ void parse_cc11_line(string buffer)
 
 }
 
-std::queue<string> help_que;
+std::queue<std::string> help_que;
 
 void update_brws_dxc_help(void *)
 {
@@ -857,7 +855,7 @@ void login_to_dxspider()
 {
 	if (!DXcluster_socket) return;
 	try {
-		string login = progStatus.dxcc_login;
+		std::string login = progStatus.dxcc_login;
 		login.append("\r\n");
 		write_socket(login);
 		show_tx_stream(login);
@@ -866,7 +864,7 @@ void login_to_dxspider()
 		connection_timeout = 0;
 		cluster_login = NIL;
 
-		string str_loggedin = "Logged in to ";
+		std::string str_loggedin = "Logged in to ";
 		str_loggedin.append(progStatus.dxcc_host_url).append(":");
 		str_loggedin.append(progStatus.dxcc_host_port);
 
@@ -881,7 +879,7 @@ void login_to_dxspider()
 void login_to_arcluster()
 {
 	try {
-		string login = progStatus.dxcc_login;
+		std::string login = progStatus.dxcc_login;
 		login.append("\r\n");
 		write_socket(login);
 		show_tx_stream(login);
@@ -890,7 +888,7 @@ void login_to_arcluster()
 		connection_timeout = 0;
 		cluster_login = NIL;
 
-		string str_loggedin = "Logged in to ";
+		std::string str_loggedin = "Logged in to ";
 		str_loggedin.append(progStatus.dxcc_host_url).append(":");
 		str_loggedin.append(progStatus.dxcc_host_port);
 
@@ -965,7 +963,7 @@ void send_name()
 
 	try {
 		guard_lock dxc_lock(&DXcluster_mutex);
-		string login;
+		std::string login;
 		login.assign("set/name ").append(progStatus.myName);
 		login.append("\r\n");
 		write_socket(login);
@@ -982,7 +980,7 @@ void send_qth()
 
 	try {
 		guard_lock dxc_lock(&DXcluster_mutex);
-		string login;
+		std::string login;
 		login.assign("set/qth ").append(progStatus.myQth);
 		login.append("\r\n");
 		write_socket(login);
@@ -999,7 +997,7 @@ void send_qra()
 
 	try {
 		guard_lock dxc_lock(&DXcluster_mutex);
-		string login;
+		std::string login;
 		login.assign("set/qra ").append(progStatus.myLocator);
 		login.append("\r\n");
 		write_socket(login);
@@ -1015,7 +1013,7 @@ void login_to_cccluster()
 	if (!DXcluster_socket) return;
 
 	try {
-		string login = progStatus.dxcc_login;
+		std::string login = progStatus.dxcc_login;
 		login.append("\r\n");
 		write_socket(login);
 		show_tx_stream(login);
@@ -1024,7 +1022,7 @@ void login_to_cccluster()
 		connection_timeout = 0;
 		cluster_login = NIL;
 
-		string str_loggedin = "Logged in to ";
+		std::string str_loggedin = "Logged in to ";
 		str_loggedin.append(progStatus.dxcc_host_url).append(":");
 		str_loggedin.append(progStatus.dxcc_host_port);
 
@@ -1043,7 +1041,7 @@ void send_password()
 		return;
 
 	try {
-		string password = inp_dxcc_password->value();
+		std::string password = inp_dxcc_password->value();
 		password.append("\r\n");
 		write_socket(password);
 		show_tx_stream(password);
@@ -1065,28 +1063,28 @@ void clear_brws_tcpip_stream(void *)
 
 void init_cluster_stream()
 {
-	string buffer;
+	std::string buffer;
 	help_lines = false;
 	tcpip_buffer.clear();
 	Fl::awake(clear_brws_tcpip_stream);
 }
 
-void parse_DXcluster_stream(string input_buffer)
+void parse_DXcluster_stream(std::string input_buffer)
 {
 	guard_lock dxcc_lock(&dxcc_mutex);
-	string buffer;
-	string ucasebuffer = ucasestr(input_buffer);
+	std::string buffer;
+	std::string ucasebuffer = ucasestr(input_buffer);
 
 	if (!logged_in) {
-		if (ucasebuffer.find("AR-CLUSTER") != string::npos) { // AR cluster
+		if (ucasebuffer.find("AR-CLUSTER") != std::string::npos) { // AR cluster
 			init_cluster_stream();
 			cluster_type = cluster_login = AR_CLUSTER;
 		}
-		else if (ucasebuffer.find("CC CLUSTER") != string::npos) { // CC cluster
+		else if (ucasebuffer.find("CC CLUSTER") != std::string::npos) { // CC cluster
 			init_cluster_stream();
 			cluster_type = cluster_login = CC_CLUSTER;
 		}
-		else if (ucasebuffer.find("LOGIN:") != string::npos) { // DX Spider
+		else if (ucasebuffer.find("LOGIN:") != std::string::npos) { // DX Spider
 			init_cluster_stream();
 			cluster_type = cluster_login = DX_SPIDER;
 		}
@@ -1094,8 +1092,8 @@ void parse_DXcluster_stream(string input_buffer)
 
 	tcpip_buffer.append(input_buffer);
 
-	string strm;
-	string its_me = progStatus.dxcc_login;
+	std::string strm;
+	std::string its_me = progStatus.dxcc_login;
 	its_me.append(" DE ");
 	its_me = ucasestr(its_me);
 	size_t p;
@@ -1103,7 +1101,7 @@ void parse_DXcluster_stream(string input_buffer)
 	while (!tcpip_buffer.empty()) {
 
 		p = tcpip_buffer.find("\n");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			write_raw(tcpip_buffer.substr(0,p+1));
 			buffer = trim(tcpip_buffer.substr(0, p+1));
 			tcpip_buffer.erase(0, p + 1);
@@ -1119,21 +1117,21 @@ void parse_DXcluster_stream(string input_buffer)
 		show_rx_stream(buffer);
 
 		ucasebuffer = ucasestr(buffer);
-		if (ucasebuffer.find("DX DE") != string::npos) {
+		if (ucasebuffer.find("DX DE") != std::string::npos) {
 			parse_dxline(buffer);
 			continue;
 		}
 
-		if (ucasebuffer.find("CC11^") != string::npos) {
+		if (ucasebuffer.find("CC11^") != std::string::npos) {
 			parse_cc11_line(buffer);
 			continue;
 		}
 
-		if ((ucasebuffer.find("HELP") != string::npos) ||
-			(ucasebuffer.find("APROPOS") != string::npos)){
+		if ((ucasebuffer.find("HELP") != std::string::npos) ||
+			(ucasebuffer.find("APROPOS") != std::string::npos)){
 			help_lines = true;
 		}
-		if (ucasebuffer.find(its_me) != string::npos) {
+		if (ucasebuffer.find(its_me) != std::string::npos) {
 			help_lines = false;
 			continue;
 		}
@@ -1142,16 +1140,16 @@ void parse_DXcluster_stream(string input_buffer)
 			continue;
 		}
 
-		if (cluster_login == AR_CLUSTER && ucasebuffer.find("CALL:") != string::npos)
+		if (cluster_login == AR_CLUSTER && ucasebuffer.find("CALL:") != std::string::npos)
 			login_to_arcluster();
 
-		if (cluster_login == CC_CLUSTER && ucasebuffer.find("CALL:") != string::npos)
+		if (cluster_login == CC_CLUSTER && ucasebuffer.find("CALL:") != std::string::npos)
 			login_to_cccluster();
 
-		if (cluster_login == DX_SPIDER && ucasebuffer.find("LOGIN:") != string::npos)
+		if (cluster_login == DX_SPIDER && ucasebuffer.find("LOGIN:") != std::string::npos)
 			login_to_dxspider();
 
-		if (ucasebuffer.find("PASSWORD:") != string::npos)
+		if (ucasebuffer.find("PASSWORD:") != std::string::npos)
 			send_password();
 
 	}
@@ -1174,7 +1172,7 @@ void clear_dxcluster_viewer()
 void DXcluster_recv_data()
 {
 	if (!DXcluster_socket) return;
-	string tempbuff;
+	std::string tempbuff;
 	try {
 		guard_lock dxc_lock(&DXcluster_mutex);
 		if (DXcluster_state == CONNECTED) {
@@ -1223,12 +1221,12 @@ void dxc_help_query()
 
 	try {
 		guard_lock dxc_lock(&DXcluster_mutex);
-		string sendbuf = "help";
+		std::string sendbuf = "help";
 		if (inp_help_string->value()[0]) {
-			string helptype = inp_help_string->value();
-			if (ucasestr(helptype).find("HELP") != string::npos)
+			std::string helptype = inp_help_string->value();
+			if (ucasestr(helptype).find("HELP") != std::string::npos)
 				sendbuf = helptype;
-			else if (ucasestr(helptype).find("APROPOS") != string::npos)
+			else if (ucasestr(helptype).find("APROPOS") != std::string::npos)
 				sendbuf = helptype;
 			else
 				sendbuf.append(" ").append(helptype);
@@ -1257,15 +1255,15 @@ void DXcluster_submit()
 	if (!DXcluster_socket) return;
 	try {
 		guard_lock dxc_lock(&DXcluster_mutex);
-		string sendbuf = trim(inp_dxcluster_cmd->value());
+		std::string sendbuf = trim(inp_dxcluster_cmd->value());
 		if (sendbuf[0] == '!') sendbuf.erase(0,1);
 		size_t n = 0;
 		while (n < sendbuf.length()) {
 			if ((unsigned int)sendbuf[n] > 0x7F) sendbuf.erase(n,1);
 			else ++n;
 		}
-		string test = ucasestr(sendbuf);
-		if (test.find("BYE") != string::npos) {
+		std::string test = ucasestr(sendbuf);
+		if (test.find("BYE") != std::string::npos) {
 			fl_alert2("Uncheck the \"Connect\" button to disconnect!");
 			logged_in = false;
 			return;
@@ -1331,10 +1329,10 @@ void DXcluster_select()
 //@B246@C56@F4@S15@r@.0920Z^		# time
 //@B246@C56@F4@S15@.				# qra
 
-	string dxcline = brws_dx_cluster->text(sel);
+	std::string dxcline = brws_dx_cluster->text(sel);
 
 	size_t p = dxcline.find("@.");
-	if (p == string::npos)
+	if (p == std::string::npos)
 		return;
 
 // remove rendition characters
@@ -1346,14 +1344,14 @@ void DXcluster_select()
 
 // find reported frequency
 	p = dxcline.find("^");
-	string sfreq = dxcline.substr(0, p);
+	std::string sfreq = dxcline.substr(0, p);
 //	dxcline.erase(0, p + 1);
 
 // find dx call
 	p = dxcline.find("@.");
 	dxcline.erase(0, p + 2);
 	p = dxcline.find("^");
-	string dxcall = trim(dxcline.substr(0, p));
+	std::string dxcall = trim(dxcline.substr(0, p));
 //	dxcline.erase(0, p + 1);
 
 // treat remainder as remarks
@@ -1367,7 +1365,7 @@ void DXcluster_select()
 	dxcline = ucasestr(dxcline);
 	int md = CW;
 	for (size_t i = 0; i < sizeof(modems) / sizeof(*modems); i++) {
-		if (dxcline.find(modems[i].srch) != string::npos) {
+		if (dxcline.find(modems[i].srch) != std::string::npos) {
 			md = modems[i].mode;
 		}
 	}
@@ -1376,7 +1374,7 @@ void DXcluster_select()
 	long freq = (long)(atof(sfreq.c_str()) * 1000.0 + 0.5);
 // does remark section have a [nn] block?
 	p = dxcline.find("[");
-	if (p != string::npos) {
+	if (p != std::string::npos) {
 		dxcline.erase(0, p+1);
 		p = dxcline.find("]");
 		if (p == 2)
@@ -1396,7 +1394,7 @@ void DXcluster_select()
 //          1     ^   2     ^   3        ^4         5         6         ^
 //7080.4 CO3VR Optional Comment
 
-void freqstrings( string &khz, string &hz )
+void freqstrings( std::string &khz, std::string &hz )
 {
 	int freq = get_fldigi_freq();
 	int ikhz = freq / 100;
@@ -1417,19 +1415,19 @@ void send_DXcluster_spot()
 {
 	std::string dxcall = get_fldigi_call();
 
-	string hz, khz;
+	std::string hz, khz;
 	freqstrings( khz, hz );
 
-	string spot = "dx ";
+	std::string spot = "dx ";
 	spot.append(khz)
 		.append(" ")
 		.append(dxcall)
 		.append(" ");
 
-	string comments = trim(inp_dxcluster_cmd->value());
-	string currmode = get_fldigi_mode();
+	std::string comments = trim(inp_dxcluster_cmd->value());
+	std::string currmode = get_fldigi_mode();
 
-	if (comments.find(currmode) == string::npos) {
+	if (comments.find(currmode) == std::string::npos) {
 		if (progStatus.dxc_hertz) {
 			currmode.append(" [")
 					.append(hz).
@@ -1631,7 +1629,7 @@ void DXcluster_doconnect()
 
 		if (logged_in) {
 			try {
-				string bye = "BYE\r\n";
+				std::string bye = "BYE\r\n";
 				write_socket(bye);
 				show_tx_stream(bye);
 				MilliSleep(100);
@@ -1813,18 +1811,18 @@ void DXcluster_close(void)
 
 void dxcluster_hosts_save()
 {
-	string hosts = "";
+	std::string hosts = "";
 	int nlines = brws_dxcluster_hosts->size();
 	if (!nlines) {
 		progStatus.dxcluster_hosts = hosts;
 		return;
 	}
-	string hostline;
+	std::string hostline;
 	size_t p;
 	for (int n = 1; n <= nlines; n++) {
 		hostline = brws_dxcluster_hosts->text(n);
 		p = hostline.find("@.");
-		if (p != string::npos) hostline.erase(0,p+2);
+		if (p != std::string::npos) hostline.erase(0,p+2);
 		hosts.append(hostline).append("|");
 	}
 	progStatus.dxcluster_hosts = hosts;
@@ -1846,18 +1844,18 @@ void dxcluster_hosts_load()
 	if (progStatus.dxcluster_hosts.empty()) {
 		return;
 	}
-	string hostline;
+	std::string hostline;
 
-	string hosts = progStatus.dxcluster_hosts;
+	std::string hosts = progStatus.dxcluster_hosts;
 	size_t p = hosts.find("|");
 	size_t p2;
-	while (p != string::npos && p != 0) {
+	while (p != std::string::npos && p != 0) {
 		hostline.assign(hosts.substr(0,p+1));
 		p2 = hostline.find("::|");
-		if (p2 != string::npos)
+		if (p2 != std::string::npos)
 			hostline.insert(p2 + 1, progStatus.myCall);
 		p2 = hostline.find("|");
-		if (p2 != string::npos) hostline.erase(p2, 1);
+		if (p2 != std::string::npos) hostline.erase(p2, 1);
 		brws_dxcluster_hosts->add(hostline.c_str());
 		hosts.erase(0, p+1);
 		p = hosts.find("|");
@@ -1868,26 +1866,26 @@ void dxcluster_hosts_load()
 
 void dxcluster_hosts_select(Fl_Button*, void*)
 {
-	string host_line;
+	std::string host_line;
 	int line_nbr = brws_dxcluster_hosts->value();
 	if (line_nbr == 0) return;
 	host_line = brws_dxcluster_hosts->text(line_nbr);
-	string	host_name,
+	std::string	host_name,
 			host_port,
 			host_login,
 			host_password;
 	size_t p = host_line.find("@.");
-	if (p != string::npos) host_line.erase(0, p + 2);
+	if (p != std::string::npos) host_line.erase(0, p + 2);
 	p = host_line.find(":");
-	if (p == string::npos) return;
+	if (p == std::string::npos) return;
 	host_name = host_line.substr(0, p);
 	host_line.erase(0, p+1);
 	p = host_line.find(":");
-	if (p == string::npos) return;
+	if (p == std::string::npos) return;
 	host_port = host_line.substr(0, p);
 	host_line.erase(0, p+1);
 	p = host_line.find(":");
-	if (p == string::npos)
+	if (p == std::string::npos)
 		host_login = host_line;
 	else {
 		host_login = host_line.substr(0, p);
@@ -1939,7 +1937,7 @@ void dxcluster_hosts_add(Fl_Button*, void*)
 	brws_dxcluster_hosts->textfont(progStatus.DXfontnbr);
 	brws_dxcluster_hosts->textsize(progStatus.DXfontsize);
 
-	string host_line = progStatus.dxcc_host_url.c_str();
+	std::string host_line = progStatus.dxcc_host_url.c_str();
 	host_line.append(":").append(progStatus.dxcc_host_port.c_str());
 	host_line.append(":").append(progStatus.dxcc_login);
 	host_line.append(":").append(progStatus.dxcc_password);
@@ -1970,7 +1968,7 @@ void dxcluster_hosts_load_setup(Fl_Button*, void*)
 
 void dxcluster_hosts_save_setup(Fl_Button*, void*)
 {
-	string defaultfilename = ScriptsDir;
+	std::string defaultfilename = ScriptsDir;
 	defaultfilename.append("default.dxc");
 	const char* p = FSEL::saveas( _("Save dxcluster setup file"), "*.dxc",
 		defaultfilename.c_str());
@@ -1979,15 +1977,15 @@ void dxcluster_hosts_save_setup(Fl_Button*, void*)
 	ed_telnet_cmds->buffer()->savefile(p);
 }
 
-void dxc_send_string(string &tosend)
+void dxc_send_string(std::string &tosend)
 {
 	if (!DXcluster_socket) return;
 
-	string line;
+	std::string line;
 	size_t p;
 	while (!tosend.empty()) {
 		p = tosend.find("\n");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			line = tosend.substr(0,p);
 			tosend.erase(0,p+1);
 		} else {
@@ -2008,7 +2006,7 @@ void dxc_send_string(string &tosend)
 void dxcluster_hosts_send_setup(Fl_Button*, void*)
 {
 	char *str = ed_telnet_cmds->buffer()->text();
-	string tosend = str;
+	std::string tosend = str;
 	free(str);
 	dxc_send_string(tosend);
 }
@@ -2019,9 +2017,9 @@ void dxcluster_hosts_send_setup(Fl_Button*, void*)
 void dxcluster_ar_help(Fl_Button*, void*)
 {
 	if (progStatus.AR_help_URL == "INTERNAL") {
-		string fn_help = HelpDir;
+		std::string fn_help = HelpDir;
 		fn_help.append("arc_help.html");
-			ofstream fo_help(fn_help.c_str());
+			std::ofstream fo_help(fn_help.c_str());
 			fo_help << arc_commands;
 			fo_help.close();
 		open_url(fn_help.c_str());
@@ -2033,9 +2031,9 @@ void dxcluster_ar_help(Fl_Button*, void*)
 void dxcluster_cc_help(Fl_Button*, void*)
 {
 	if (progStatus.CC_help_URL == "INTERNAL") {
-		string fn_help = HelpDir;
+		std::string fn_help = HelpDir;
 		fn_help.append("ccc_help.html");
-			ofstream fo_help(fn_help.c_str());
+			std::ofstream fo_help(fn_help.c_str());
 			fo_help << ccc_commands;
 			fo_help.close();
 		open_url(fn_help.c_str());
@@ -2047,9 +2045,9 @@ void dxcluster_cc_help(Fl_Button*, void*)
 void dxcluster_dx_help(Fl_Button*, void*)
 {
 	if (progStatus.DX_help_URL == "INTERNAL") {
-		string fn_help = HelpDir;
+		std::string fn_help = HelpDir;
 		fn_help.append("dxc_help.html");
-			ofstream fo_help(fn_help.c_str());
+			std::ofstream fo_help(fn_help.c_str());
 			fo_help << dxspider_cmds;
 			fo_help.close();
 		open_url(fn_help.c_str());
@@ -2061,9 +2059,9 @@ void dxcluster_dx_help(Fl_Button*, void*)
 void dxcluster_servers(Fl_Button*, void*)
 {
 	if (progStatus.serversURL == "INTERNAL") {
-		string fn_help = HelpDir;
+		std::string fn_help = HelpDir;
 		fn_help.append("dxc_servers.html");
-			ofstream fo_help(fn_help.c_str());
+			std::ofstream fo_help(fn_help.c_str());
 			fo_help << dxcc_servers;
 			fo_help.close();
 		open_url(fn_help.c_str());

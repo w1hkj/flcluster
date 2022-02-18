@@ -89,13 +89,11 @@ static const char *copyright[] = {
 
 #include "XmlRpcClient.h"
 
-using namespace std;
-
 Fl_Double_Window *main_window = (Fl_Double_Window *)0;
 
 bool dx_stream = false;
 
-//! @brief Command line help string initialization
+//! @brief Command line help std::string initialization
 const char *options[] = {
 	"Flcluster Unique Options",
 	"",
@@ -172,7 +170,7 @@ void checkdirectories(void)
 {
 
 	struct DIRS {
-		string& dir;
+		std::string& dir;
 		const char* suffix;
 		void (*new_dir_func)(void);
 	};
@@ -209,7 +207,7 @@ void checkdirectories(void)
 			FLCLUSTER_dirs[i].dir.assign(HOME_DIR).append(FLCLUSTER_dirs[i].suffix).append("/");
 
 		if ((r = mkdir(FLCLUSTER_dirs[i].dir.c_str(), 0777)) == -1 && errno != EEXIST) {
-			cerr << _("Could not make directory") << ' ' << FLCLUSTER_dirs[i].dir
+			std::cerr << _("Could not make directory") << ' ' << FLCLUSTER_dirs[i].dir
 			     << ": " << strerror(errno) << '\n';
 			exit(EXIT_FAILURE);
 		}
@@ -237,10 +235,10 @@ int parse_args(int argc, char **argv, int& idx)
 	if (strstr(argv[idx], "--config-dir")) {
 		std::string temp_dir = "";
 		idx++;
-		string tmp = argv[idx];
+		std::string tmp = argv[idx];
 		if (!tmp.empty()) temp_dir = tmp;
-		size_t p = string::npos;
-		while ( (p = temp_dir.find("\\")) != string::npos)
+		size_t p = std::string::npos;
+		while ( (p = temp_dir.find("\\")) != std::string::npos)
 			temp_dir[p] = '/';
 		if (temp_dir[temp_dir.length()-1] != '/')
 			temp_dir += '/';
@@ -331,7 +329,7 @@ int main (int argc, char *argv[])
 
 	progStatus.loadLastState();
 
-	string debug_file = HOME_DIR;
+	std::string debug_file = HOME_DIR;
 	debug_file.append("debug_log.txt");
 	debug::start(debug_file.c_str());
 
@@ -357,7 +355,7 @@ int main (int argc, char *argv[])
 	main_window->show(argc, argv);
 #endif
 
-	string main_label = PACKAGE_NAME;
+	std::string main_label = PACKAGE_NAME;
 	main_label.append(": ").append(PACKAGE_VERSION);
 	main_window->label(main_label.c_str());
 
@@ -409,7 +407,7 @@ void open_url(const char* url)
 					  strerror(errno), url);
 	}
 #else
-	if ((int)ShellExecute(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL) <= 32)
+	if ((size_t)ShellExecute(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL) <= 32)
 		fl_alert2(_("Could not open url:\n%s\n"), url);
 #endif
 }

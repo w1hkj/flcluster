@@ -34,8 +34,6 @@
 #include <string>
 
 using namespace XmlRpc;
-using namespace std;
-
 // Static data
 const char REQUEST_BEGIN[] = 
   "<?xml version=\"1.0\"?>\r\n";
@@ -336,11 +334,11 @@ XmlRpcClient::generateHeader(std::string const& body)
     header += "Authorization: Basic ";
     std::string authEnc(base64data.begin(), base64data.end());
     // handle pesky linefeed characters
-    string::size_type lf;
-    while ( (lf = authEnc.find("\r")) != string::npos ) {
+    std::string::size_type lf;
+    while ( (lf = authEnc.find("\r")) != std::string::npos ) {
       authEnc.erase(lf, 1);
     }
-    while ( (lf = authEnc.find("\n")) != string::npos ) {
+    while ( (lf = authEnc.find("\n")) != std::string::npos ) {
       authEnc.erase(lf, 1);
     }
     header += authEnc;
@@ -413,7 +411,7 @@ bool
 XmlRpcClient::parseHeader()
 {
   char const *hp = _header.c_str();         // Start of header
-  char const *ep = hp + _header.length();   // End of string
+  char const *ep = hp + _header.length();   // End of std::string
   char const *bp = 0;                       // Start of body
   char const *lp = 0;                       // Start of content-length value
 

@@ -34,7 +34,6 @@
 #include "status.h"
 #include "dx_dialog.h"
 
-using namespace std;
 using XmlRpc::XmlRpcValue;
 
 struct DX_STA {
@@ -219,7 +218,7 @@ static void read_fldigi_freq()
 		execute(log_get_frequency, XmlRpcValue(), res);
 		std::string sfreq((std::string)res);
 		size_t p = sfreq.find(".");
-		if (p != string::npos) sfreq.erase(p,1);
+		if (p != std::string::npos) sfreq.erase(p,1);
 		lfreq = atol(sfreq.c_str());
 		fldigi_online = true;
 		Fl::awake(set_fldigi_connect, (void *)1);

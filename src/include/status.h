@@ -28,8 +28,6 @@
 
 #include <string>
 
-using namespace std;
-
 struct status {
 	int		mainX;
 	int		mainY;
