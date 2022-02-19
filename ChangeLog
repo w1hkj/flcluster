@@ -1,6 +1,9 @@
-2021-08-04  dave-w1hkj  <w1hkj@bellsouth.net>
+2022-02-18  dave-w1hkj  <w1hkj@bellsouth.net>
 
-	91fa2a3: Version 1.0.7
+	d57bdce: alpha
+	4c9b073: namespace std
+	7c11132: Macros
+	f8fd5f3: Version 1.0.7
 	49d251b: Xmlrpc Client ID
 	2c2cfb7: openSUSE Tumbleweed
 	554952f: Scripts
